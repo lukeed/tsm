@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    name: Node.js v${{ matrix.nodejs }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        nodejs: [12, 14, 16]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.nodejs }}
+
+    - name: (env) pnpm
+      run: curl -L https://raw.githubusercontent.com/pnpm/self-installer/master/install.js | node
+
+    - name: Install
+      run: pnpm install
+
+    - name: Compiles
+      run: pnpm run build
+
+    - name: Type Checks
+      run: pnpm run test
