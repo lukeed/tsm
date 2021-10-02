@@ -53,7 +53,7 @@ exports.$finalize = function (base: Options, custom?: Config): Config {
 	// TODO: support named exports: config, options (defaults), loaders[]
 	if (custom) for (let extn in custom) {
 		// @ts-ignore - interpolated string key vs string key
-		config[extn.charAt(0) === '.' ? extn : `.${extn}`] = { ...base, ...map[extn] };
+		config[extn.charAt(0) === '.' ? extn : `.${extn}`] = { ...base, ...custom[extn] };
 	}
 
 	return config;

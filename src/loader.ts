@@ -1,9 +1,11 @@
 import * as tsm from 'tsm';
 import { existsSync } from 'fs';
-import { URL, fileURLToPath } from 'url';
+import * as url from 'url';
 
 let config: tsm.Config;
+let env = tsm.$defaults('esm');
 let esbuild: typeof import('esbuild');
+let setup = env.file && import(env.file);
 
 type Promisable<T> = Promise<T> | T;
 type Source = string | SharedArrayBuffer | Uint8Array;
@@ -30,41 +32,41 @@ type Transform = (
 	fallback: Transform
 ) => Promisable<{ source: Source }>;
 
-async function load(): Promise<tsm.Config> {
-	let { file, options } = tsm.$defaults('esm');
-	let m = file && await import('file:///' + file);
-	return tsm.$finalize(options, m && m.default || m);
+async function load() {
+	let mod = await setup;
+	mod = mod && mod.default || mod;
+	return tsm.$finalize(env.options, mod);
 }
 
 const EXTN = /\.\w+(?=\?|$)/;
-async function toOptions(url: string): Promise<tsm.Options|void> {
+async function toOptions(uri: string): Promise<tsm.Options|void> {
 	config = config || await load();
-	let [extn] = EXTN.exec(url) || [];
+	let [extn] = EXTN.exec(uri) || [];
 	return config[extn as any];
 }
 
-const root = new URL('file:///' + process.cwd() + '/');
+const root = url.pathToFileURL(process.cwd() + '/');
 export const resolve: Resolve = async function (ident, context, fallback) {
 	// ignore "prefix:" and non-relative identifiers
 	if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
 
-	let output = new URL(ident, context.parentURL || root);
+	let output = new url.URL(ident, context.parentURL || root);
 	if (EXTN.test(output.pathname)) return { url: output.href };
 
 	config = config || await load();
 
 	let tmp, ext, path;
 	for (ext in config) {
-		path = fileURLToPath(tmp = output.href + ext);
+		path = url.fileURLToPath(tmp = output.href + ext);
 		if (existsSync(path)) return { url: tmp };
 	}
 
 	return fallback(ident, context, fallback);
 }
 
-export const getFormat: Inspect = async function (url, context, fallback) {
-	let options = await toOptions(url);
-	if (options == null) return fallback(url, context, fallback);
+export const getFormat: Inspect = async function (uri, context, fallback) {
+	let options = await toOptions(uri);
+	if (options == null) return fallback(uri, context, fallback);
 	return { format: options.format === 'cjs' ? 'commonjs' : 'module' };
 }
 
