@@ -3,3 +3,7 @@ node_modules
 *-lock.*
 *.lock
 *.log
+
+/bin.js
+/require.js
+/loader.mjs

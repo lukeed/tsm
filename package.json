@@ -30,6 +30,9 @@
   "engines": {
     "node": ">=12"
   },
+  "scripts": {
+    "build": "node build"
+  },
   "dependencies": {
     "esbuild": "^0.13.3"
   },
