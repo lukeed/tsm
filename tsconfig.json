@@ -18,6 +18,9 @@
     "module": "esnext",
     "checkJs": true,
     "noEmit": true,
+    "paths": {
+      "tsm": ["./"]
+    }
   },
   "include": [
     "src"
