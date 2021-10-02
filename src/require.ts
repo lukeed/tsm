@@ -1,38 +1,34 @@
-// TODO: config check extensions -> do something?
+const tsm = require('tsm');
+const { extname } = require('path');
 
-// const { FORCE_COLOR, NO_COLOR, NODE_DISABLE_COLORS } = process.env;
-const version = process.versions.node;
-const loadJS = require.extensions['.js'];
+import type { Config } from 'tsm';
 
 type Module = NodeJS.Module & {
 	_compile?(source: string, filename: string): typeof loader;
 };
 
-let esbuild: typeof import('esbuild');
-import type { Loader } from 'esbuild';
+const loadJS = require.extensions['.js'];
 
-function loader(type: Loader, Module: Module, filename: string) {
-	const pitch = Module._compile!.bind(Module);
+let esbuild: typeof import('esbuild');
+let { file, options } = tsm.$defaults('cjs');
+let config: Config = tsm.$finalize(options, file && require(file));
+
+function loader(Module: Module, sourcefile: string) {
+	let extn = extname(sourcefile);
+	let pitch = Module._compile!.bind(Module);
 
 	Module._compile = source => {
-		esbuild = esbuild || require('esbuild');
-		let result = esbuild.transformSync(source, {
-			format: 'cjs',
-			target: 'node' + version,
-			color: true, // TODO: FORCE_COLOR > NO_COLOR/NODE_DISABLE_COLORS
-			sourcefile: filename,
-			logLevel: 'warning', // TODO: --verbose
-			sourcemap: 'inline',
-			loader: type
-		});
+		let options = config[extn];
+		if (options == null) return pitch(source, sourcefile);
 
-		return pitch(result.code, filename);
+		esbuild = esbuild || require('esbuild');
+		let result = esbuild.transformSync(source, { ...options, sourcefile });
+		return pitch(result.code, sourcefile);
 	};
 
-	return loadJS(Module, filename);
+	return loadJS(Module, sourcefile);
 }
 
-require.extensions['.ts'] = loader.bind(0, 'ts');
-require.extensions['.tsx'] = loader.bind(0, 'tsx');
-require.extensions['.jsx'] = loader.bind(0, 'jsx');
-require.extensions['.mjs'] = loader.bind(0, 'js');
+for (let extn in config) {
+	require.extensions[extn] = loader;
+}
