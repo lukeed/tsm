@@ -1,0 +1,47 @@
+{
+  "name": "tsm",
+  "version": "0.0.0",
+  "repository": "lukeed/tsm",
+  "description": "WIP",
+  "license": "MIT",
+  "bin": "bin.js",
+  "author": {
+    "name": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "https://lukeed.com"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./loader": {
+      "import": "./loader.mjs"
+    },
+    "./register": {
+      "require": "./require.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin.js",
+    "index.js",
+    "register.js",
+    "loader.mjs",
+    "index.d.ts"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "dependencies": {
+    "esbuild": "^0.13.3"
+  },
+  "devDependencies": {
+    "@types/node": "16.10.2"
+  },
+  "keywords": [
+    "esm",
+    "loader",
+    "typescript",
+    "loader hook",
+    "require hook",
+    "experimental-loader"
+  ]
+}
