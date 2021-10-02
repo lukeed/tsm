@@ -31,13 +31,15 @@
     "node": ">=12"
   },
   "scripts": {
-    "build": "node build"
+    "build": "node build",
+    "test": "tsc"
   },
   "dependencies": {
     "esbuild": "^0.13.3"
   },
   "devDependencies": {
-    "@types/node": "16.10.2"
+    "@types/node": "16.10.2",
+    "typescript": "4.4.3"
   },
   "keywords": [
     "esm",
