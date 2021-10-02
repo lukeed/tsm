@@ -1,6 +1,6 @@
 {
   "name": "tsm",
-  "version": "1.0.1",
+  "version": "2.0.0-next.0",
   "repository": "lukeed/tsm",
   "description": "TypeScript Modules",
   "license": "MIT",
