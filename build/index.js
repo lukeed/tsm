@@ -3,7 +3,6 @@ const pkg = require('../package.json');
 
 (async function () {
 	let shared = {
-		external: 'tsm',
 		logLevel: 'info',
 		charset: 'utf8',
 		minify: true,
