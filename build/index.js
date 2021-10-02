@@ -19,6 +19,12 @@ const pkg = require('../package.json');
 
 	await build({
 		...shared,
+		entryPoints: ['src/index.ts'],
+		outfile: pkg.exports['.'],
+	});
+
+	await build({
+		...shared,
 		entryPoints: ['src/require.ts'],
 		outfile: pkg.exports['./register'].require,
 	});
