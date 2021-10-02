@@ -1,8 +1,8 @@
 {
   "name": "tsm",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "repository": "lukeed/tsm",
-  "description": "WIP",
+  "description": "TypeScript Modules",
   "license": "MIT",
   "bin": "bin.js",
   "author": {
