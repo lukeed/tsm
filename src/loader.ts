@@ -1,4 +1,6 @@
 import * as tsm from 'tsm';
+import { existsSync } from 'fs';
+import { URL, fileURLToPath } from 'url';
 
 let config: tsm.Config;
 let esbuild: typeof import('esbuild');
@@ -7,16 +9,25 @@ type Promisable<T> = Promise<T> | T;
 type Source = string | SharedArrayBuffer | Uint8Array;
 type Format = 'builtin' | 'commonjs' | 'json' | 'module' | 'wasm';
 
+type Resolve = (
+	ident: string,
+	context: {
+		conditions: string[];
+		parentURL?: string;
+	},
+	fallback: Resolve
+) => Promisable<{ url: string }>;
+
 type Inspect = (
 	url: string,
 	context: object,
-	defaultInspect: Inspect
+	fallback: Inspect
 ) => Promisable<{ format: Format }>;
 
 type Transform = (
 	source: Source,
 	context: Record<'url' | 'format', string>,
-	defaultTransform: Transform
+	fallback: Transform
 ) => Promisable<{ source: Source }>;
 
 const EXTN = /\.\w+(?=\?|$)/;
@@ -26,13 +37,32 @@ async function toOptions(url: string): Promise<tsm.Options|void> {
 	return config[extn as any];
 }
 
-export const getFormat: Inspect = async (url, context, fallback) => {
+const root = new URL('file:///' + process.cwd() + '/');
+export const resolve: Resolve = async function (ident, context, fallback) {
+	// ignore "prefix:" and non-relative identifiers
+	if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
+
+	let output = new URL(ident, context.parentURL || root);
+	if (EXTN.test(output.pathname)) return { url: output.href };
+
+	config = config || await tsm.options('esm');
+
+	let tmp, ext, path;
+	for (ext in config) {
+		path = fileURLToPath(tmp = output.href + ext);
+		if (existsSync(path)) return { url: tmp };
+	}
+
+	return fallback(ident, context, fallback);
+}
+
+export const getFormat: Inspect = async function (url, context, fallback) {
 	let options = await toOptions(url);
 	if (options == null) return fallback(url, context, fallback);
 	return { format: options.format === 'cjs' ? 'commonjs' : 'module' };
 }
 
-export const transformSource: Transform = async (source, context, xform) => {
+export const transformSource: Transform = async function (source, context, xform) {
 	let options = await toOptions(context.url);
 	if (options == null) return xform(source, context, xform);
 
