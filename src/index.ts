@@ -6,9 +6,10 @@ import type { Config, Options } from '../';
 
 exports.define = (c: Config) => c;
 
-// TODO: check/load config file
-// TODO: options vs loaders
-exports.options = async function (format?: Format): Promise<Config> {
+exports.$defaults = function (format?: Format): {
+	file: string | false,
+	options: Options,
+} {
 	let { FORCE_COLOR, NO_COLOR, NODE_DISABLE_COLORS, TERM } = process.env;
 
 	let argv = process.argv.slice(2);
@@ -26,15 +27,22 @@ exports.options = async function (format?: Format): Promise<Config> {
 		: (flags.has('-V')||flags.has('--verbose')) ? 'verbose'
 		: 'warning';
 
-	let base: Options = {
-		format: format,
-		charset: 'utf8',
-		sourcemap: 'inline',
-		target: 'node' + process.versions.node,
-		logLevel: level,
-		color: enabled,
+	return {
+		file: existsSync(file) && file,
+		options: {
+			format: format,
+			charset: 'utf8',
+			sourcemap: 'inline',
+			target: 'node' + process.versions.node,
+			logLevel: level,
+			color: enabled,
+		}
 	};
+};
 
+// TODO: check/load config file
+// TODO: support named exports: default/"config", "options" (shared)
+exports.$finalize = function (base: Options, custom?: Config): Config {
 	let config: Config = {
 		'.jsx': { ...base, loader: 'jsx' },
 		'.tsx': { ...base, loader: 'tsx' },
@@ -42,14 +50,10 @@ exports.options = async function (format?: Format): Promise<Config> {
 		'.ts': { ...base, loader: 'ts' },
 	};
 
-	if (existsSync(file)) {
-		// TODO: support named exports: config, options (defaults), loaders[]
-		let m = await import('file:///' + file);
-		let extn, map: Config = m.default || m;
-		for (extn in map) {
-			// @ts-ignore - interpolated string key vs string key
-			config[extn.charAt(0) === '.' ? extn : `.${extn}`] = { ...base, ...map[extn] };
-		}
+	// TODO: support named exports: config, options (defaults), loaders[]
+	if (custom) for (let extn in custom) {
+		// @ts-ignore - interpolated string key vs string key
+		config[extn.charAt(0) === '.' ? extn : `.${extn}`] = { ...base, ...map[extn] };
 	}
 
 	return config;

@@ -11,7 +11,16 @@ export type Config = {
 export function define(config: Config): Config;
 
 /**
- * Generates full `Config` with defaults and custom file.
+ * Analyze ENV and ARGV for default Config object.
  * @note internal utility
  */
-export function options(format?: Format): Promise<Config>;
+export function $defaults(format?: Format): {
+	file: string | false;
+	options: Options;
+}
+
+/**
+ * Convert `Options` into `Config` and merge w/ custom `Config` object.
+ * @note internal utility
+ */
+export function $finalize(base: Options, custom?: Config): Config;

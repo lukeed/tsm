@@ -30,9 +30,15 @@ type Transform = (
 	fallback: Transform
 ) => Promisable<{ source: Source }>;
 
+async function load(): Promise<tsm.Config> {
+	let { file, options } = tsm.$defaults('esm');
+	let m = file && await import('file:///' + file);
+	return tsm.$finalize(options, m && m.default || m);
+}
+
 const EXTN = /\.\w+(?=\?|$)/;
 async function toOptions(url: string): Promise<tsm.Options|void> {
-	config = config || await tsm.options('esm');
+	config = config || await load();
 	let [extn] = EXTN.exec(url) || [];
 	return config[extn as any];
 }
@@ -45,7 +51,7 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 	let output = new URL(ident, context.parentURL || root);
 	if (EXTN.test(output.pathname)) return { url: output.href };
 
-	config = config || await tsm.options('esm');
+	config = config || await load();
 
 	let tmp, ext, path;
 	for (ext in config) {
