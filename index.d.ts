@@ -3,3 +3,4 @@ export interface Config {
 }
 
 export function define(config: Config): Config;
+export function options(): Config;
