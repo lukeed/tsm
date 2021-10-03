@@ -33,7 +33,7 @@ The `--require` hook has existed for a _very_ long time and many tools throughou
 
 > **Background:** Essentially, the `--require/-r` hook subjects any `require()`d file to additional and/or custom transformation(s). Even though this works on a per-extension basis, it can be quite costly (performance-wise) and there is discouraged; however, for tools like `tsm`, it's still valuable.
 
-A [configuration file](/docs/configuration.md) is still auto-loaded (if exists) when using `--require tsm` or `-r tsm`.
+A [configuration file](/docs/configuration.md#config-file) is still auto-loaded (if exists) when using `--require tsm` or `-r tsm`.
 
 ***Examples***
 
@@ -55,7 +55,7 @@ The `--loader` hook is ESM's version of the `--require` hook. A loader is **only
 
 You may use `--loader tsm` or `--experimental-loader tsm` anywhere that supports ESM loaders. At time of writing, this seems to be limited to `node` itself.
 
-A [configuration file](/docs/configuration.md) is still auto-loaded (if exists) when using `--loader tsm`.
+A [configuration file](/docs/configuration.md#config-file) is still auto-loaded (if exists) when using `--loader tsm`.
 
 ***Examples***
 
