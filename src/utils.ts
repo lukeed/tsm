@@ -1,13 +1,12 @@
-// @ts-check
 const { resolve } = require('path');
 const { existsSync } = require('fs');
 
 import type { Format, LogLevel } from 'esbuild';
-import type { Config, Options } from 'tsm/config';
+import type * as tsm from 'tsm/config';
 
 exports.$defaults = function (format?: Format): {
 	file: string | false,
-	options: Options,
+	options: tsm.Options,
 } {
 	let { FORCE_COLOR, NO_COLOR, NODE_DISABLE_COLORS, TERM } = process.env;
 
@@ -39,20 +38,27 @@ exports.$defaults = function (format?: Format): {
 	};
 };
 
-// TODO: check/load config file
-// TODO: support named exports: default/"config", "options" (shared)
-exports.$finalize = function (base: Options, custom?: Config): Config {
-	let config: Config = {
+exports.$finalize = function (base: tsm.Options, custom?: tsm.ConfigFile): tsm.Config {
+	if (custom && custom.common) {
+		Object.assign(base, custom.common!);
+		delete custom.common; // loop below
+	}
+
+	let config: tsm.Config = {
 		'.jsx': { ...base, loader: 'jsx' },
 		'.tsx': { ...base, loader: 'tsx' },
-		'.mjs': { ...base, loader: 'js' },
+		'.mjs': { ...base, loader: 'js' }, // todo: remove?
 		'.ts': { ...base, loader: 'ts' },
 	};
 
-	// TODO: support named exports: config, options (defaults), loaders[]
-	if (custom) for (let extn in custom) {
-		// @ts-ignore - interpolated string key vs string key
-		config[extn.charAt(0) === '.' ? extn : `.${extn}`] = { ...base, ...custom[extn] };
+	let extn: tsm.Extension;
+	if (custom && custom.loaders) {
+		for (extn in custom.loaders) config[extn] = {
+			...base, loader: custom.loaders[extn]
+		};
+	} else if (custom) {
+		let conf = (custom.config || custom) as tsm.Config;
+		for (extn in conf) config[extn] = { ...base, ...conf[extn] };
 	}
 
 	return config;

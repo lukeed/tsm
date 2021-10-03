@@ -23,7 +23,8 @@
   },
   "include": [
     "build",
-    "src"
+    "test",
+    "src",
   ],
   "exclude": [
     "node_modules"
