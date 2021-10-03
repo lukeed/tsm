@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.png" alt="tsm" width="80" />
+  <img src="logo.png" alt="tsm" width="200" />
 </div>
 
 <div align="center">
