@@ -39,13 +39,15 @@ When a `tsm.js` file exists in the current working directory ([`process.cwd()`](
 
 The module format of the `tsm.js` file is controlled by the root [`package.json` file](https://nodejs.org/api/esm.html#esm_enabling), also located in the current working directory. For example, if it contains `"type": "module"` then the `tsm.js` file may be written in ESM syntax (`import`/`export`). Otherwise it must be in CommonJS format. (This is true for all `.js` files.)
 
-Additionally, when using tsm as a `node` replacement, you may provide a path to an alternate configuration file through the `--config` argument. For example, to load a `tsm.config.mjs` file, you should run:
+Additionally, when using tsm as a `node` replacement, you may provide a path to an alternate configuration file through the `--tsmconfig` argument. For example, to load a `tsm.config.mjs` file, you should run:
 
 ```sh
-$ tsm server.ts --config tsm.config.mjs
+$ tsm server.ts --tsmconfig tsm.config.mjs
 ```
 
-> **Note:** Any `--config` value is always resolved from the `process.cwd()`
+> **Note:** Any `--tsmconfig` value is always resolved from the `process.cwd()`
+
+When using tsm through a `--require` or `--loader` hook, the `--tsmconfig` flag is respected and your custom configuration file will be autoloaded, if found.
 
 
 ### Contents

@@ -8,16 +8,16 @@ if (argv.includes('-h') || argv.includes('--help')) {
 	let msg = '';
 	msg += '\n  Usage\n    $ tsm [options] -- <command>\n';
 	msg += '\n  Options';
-	msg += `\n    --config    Configuration file path (default: tsm.js)`;
-	msg += `\n    --quiet     Silence all terminal messages`;
-	msg += `\n    --version   Displays current version`;
-	msg += '\n    --help      Displays this message\n';
+	msg += `\n    --tsmconfig    Configuration file path (default: tsm.js)`;
+	msg += `\n    --quiet        Silence all terminal messages`;
+	msg += `\n    --version      Displays current version`;
+	msg += '\n    --help         Displays this message\n';
 	msg += '\n  Examples';
 	msg += '\n    $ tsm server.ts';
 	msg += '\n    $ node -r tsm input.jsx';
 	msg += '\n    $ node --loader tsm input.jsx';
 	msg += '\n    $ NO_COLOR=1 tsm input.jsx --trace-warnings';
-	msg += '\n    $ tsm server.tsx --config tsm.mjs\n';
+	msg += '\n    $ tsm server.tsx --tsmconfig tsm.mjs\n';
 	console.log(msg);
 	process.exit(0);
 }

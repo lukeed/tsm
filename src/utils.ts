@@ -20,7 +20,7 @@ exports.$defaults = function (format?: Format): {
 		FORCE_COLOR != null && FORCE_COLOR !== '0' || process.stdout.isTTY
 	);
 
-	let idx = flags.has('--config') ? argv.indexOf('--config') : -1;
+	let idx = flags.has('--tsmconfig') ? argv.indexOf('--tsmconfig') : -1;
 	let file = resolve('.', !!~idx && argv[++idx] || 'tsm.js');
 
 	return {
