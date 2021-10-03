@@ -1,6 +1,5 @@
 <div align="center">
   <img src="logo.png" alt="tsm" width="80" />
-  <p>TypeScript Modules</p>
 </div>
 
 <div align="center">
@@ -17,6 +16,8 @@
     <img src="https://badgen.net/packagephobia/publish/tsm" alt="publish size" />
   </a>
 </div>
+
+<div align="center">TypeScript Modules</div>
 
 ## Features
 
