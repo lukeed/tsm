@@ -52,10 +52,62 @@ $ tsm server.ts --config tsm.config.mjs
 
 There multiple ways to define your configuration.
 
+> **Note:** See [Examples](#examples) below for demonstrations.
+
+Conceptually, configuration is broken down by extension, allowing each each extension to take its own `esbuild.transform` options. The extensions themselves are used as keys within the configuration object; for example, `.ts` **not** `ts`. While verbose, this is the clearest way to visualize and understand what/how each extension is handled.
+
+The extensions' configuration can remain free-standing, but you may also wrap it in a `config` key for added clarity. This object may be exported from the file as a named `config` export or the default export.
+
+However, as you might imagine, this may become overwhelming and/or repetitive. To alleviate this, tsm allows a `common` object to extract and share common options across _all_ extensions. The `common` key may coexist with all other configuration formats (see below) and may be exported from the configuration file as a named `common` export or as a `common` key on the default exported object.
+
+After extracting shared options to a `common` key, you may find that all your `config` is doing is defining an esbuild `loader` option. If this is the case, you may replace the `config` object with a `loaders` object that maps an extension to its (string) loader name. For example:
+
+```diff
+--let config = {
+--  '.ts': {
+--    loader: 'ts'
+--  },
+--  '.html': {
+--    loader: 'text'
+--  }
+--};
+
+++let loaders = {
+++  '.ts': 'ts',
+++  '.html': 'text',
+++};
+```
+
+However, when using the `loaders` approach, you **cannot** continue to use a `config` object. The `loaders` key may only coexist with the `common` options object. Should you need to add additional, extension-specific configuration, then you cannot use `loaders` and must use the `config` approach instead.
+
+Finally, the `tsm/config` submodule offers a `define` method that can be used to typecheck/validate your configuration. All previous approaches and combinations still apply when using the `define` helper. For simplicity, you should use this helper as your default export; for example:
+
+```js
+// ESM syntax
+import { define } from 'tsm/config';
+
+export default define({
+  common: {
+    target: 'es2021',
+    minify: true,
+  },
+
+  '.ts': {
+    minify: false,
+  },
+
+  '.html': {
+    loader: 'text',
+  },
+
+  // ...
+});
+```
+
+
 ### Examples
 
 > **Important:** Ignoring the authoring format (CommonJS vs ESM), all snippets produce the identical final configuration.
-
 
 ***Define each extension***
 
@@ -69,7 +121,7 @@ let config = {
   '.tsx': {
     jsxFactory: 'preact.h',
     jsxFragment: 'preact.Fragment',
-    banner: 'import * as preact from "preact";'
+    banner: 'import * as preact from "preact";',
     minifyWhitespace: true,
     target: 'es2020',
     loader: 'tsx',
@@ -77,7 +129,7 @@ let config = {
   '.jsx': {
     jsxFactory: 'preact.h',
     jsxFragment: 'preact.Fragment',
-    banner: 'import * as preact from "preact";'
+    banner: 'import * as preact from "preact";',
     minifyWhitespace: true,
     target: 'es2020',
     loader: 'jsx',
@@ -111,7 +163,7 @@ let common = {
   target: 'es2020',
   jsxFactory: 'preact.h',
   jsxFragment: 'preact.Fragment',
-  banner: 'import * as preact from "preact";'
+  banner: 'import * as preact from "preact";',
 }
 
 // Retain unique per-extension config
@@ -149,7 +201,7 @@ let common = {
   target: 'es2020',
   jsxFactory: 'preact.h',
   jsxFragment: 'preact.Fragment',
-  banner: 'import * as preact from "preact";'
+  banner: 'import * as preact from "preact";',
 }
 
 // When *only* need to define a loader
@@ -188,7 +240,7 @@ export default define({
     target: 'es2020',
     jsxFactory: 'preact.h',
     jsxFragment: 'preact.Fragment',
-    banner: 'import * as preact from "preact";'
+    banner: 'import * as preact from "preact";',
   },
 
   // Here you can define (exclusive):
