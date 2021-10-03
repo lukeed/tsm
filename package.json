@@ -1,8 +1,8 @@
 {
   "name": "tsm",
   "version": "2.0.0-next.0",
-  "repository": "lukeed/tsm",
   "description": "TypeScript Modules",
+  "repository": "lukeed/tsm",
   "license": "MIT",
   "bin": "bin.js",
   "author": {
@@ -11,21 +11,19 @@
     "url": "https://lukeed.com"
   },
   "exports": {
-    ".": "./index.js",
-    "./loader": {
-      "import": "./loader.mjs"
-    },
-    "./register": {
+    ".": {
+      "import": "./loader.mjs",
       "require": "./require.js"
     },
+    "./config": "./config/index.js",
     "./package.json": "./package.json"
   },
   "files": [
     "bin.js",
-    "index.js",
-    "register.js",
+    "utils.js",
+    "require.js",
     "loader.mjs",
-    "index.d.ts"
+    "config"
   ],
   "engines": {
     "node": ">=12"

@@ -1,10 +1,9 @@
+// @ts-check
 const { resolve } = require('path');
 const { existsSync } = require('fs');
 
 import type { Format, LogLevel } from 'esbuild';
-import type { Config, Options } from '../';
-
-exports.define = (c: Config) => c;
+import type { Config, Options } from 'tsm/config';
 
 exports.$defaults = function (format?: Format): {
 	file: string | false,

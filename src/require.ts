@@ -1,7 +1,7 @@
-const tsm = require('tsm');
 const { extname } = require('path');
+const tsm = require('./utils');
 
-import type { Config } from 'tsm';
+import type { Config } from 'tsm/config';
 
 type Module = NodeJS.Module & {
 	_compile?(source: string, filename: string): typeof loader;

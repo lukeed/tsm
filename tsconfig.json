@@ -18,10 +18,11 @@
     "checkJs": true,
     "noEmit": true,
     "paths": {
-      "tsm": ["./"]
+      "tsm/config": ["./config/index.d.ts"]
     }
   },
   "include": [
+    "build",
     "src"
   ],
   "exclude": [

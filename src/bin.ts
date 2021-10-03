@@ -24,6 +24,6 @@ if (argv.includes('-v') || argv.includes('--version')) {
 	process.exit(0);
 }
 
-require('child_process').spawn('node', ['--loader', 'tsm/loader', ...argv], {
+require('child_process').spawn('node', ['--loader', 'tsm', ...argv], {
 	stdio: 'inherit'
 }).on('exit', process.exit);

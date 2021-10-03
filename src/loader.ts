@@ -1,10 +1,14 @@
-import * as tsm from 'tsm';
-import { existsSync } from 'fs';
 import * as url from 'url';
+import { existsSync } from 'fs';
+import * as tsm from './utils.js';
 
-let config: tsm.Config;
-let env = tsm.$defaults('esm');
+import type { Config, Options } from 'tsm/config';
+type TSM = typeof import('./utils.d');
+
+let config: Config;
 let esbuild: typeof import('esbuild');
+
+let env = (tsm as TSM).$defaults('esm');
 let setup = env.file && import(env.file);
 
 type Promisable<T> = Promise<T> | T;
@@ -32,17 +36,17 @@ type Transform = (
 	fallback: Transform
 ) => Promisable<{ source: Source }>;
 
-async function load() {
+async function load(): Promise<Config> {
 	let mod = await setup;
 	mod = mod && mod.default || mod;
-	return tsm.$finalize(env.options, mod);
+	return (tsm as TSM).$finalize(env.options, mod);
 }
 
 const EXTN = /\.\w+(?=\?|$)/;
-async function toOptions(uri: string): Promise<tsm.Options|void> {
+async function toOptions(uri: string): Promise<Options|void> {
 	config = config || await load();
 	let [extn] = EXTN.exec(uri) || [];
-	return config[extn as any];
+	return config[extn as `.${string}`];
 }
 
 const root = url.pathToFileURL(process.cwd() + '/');

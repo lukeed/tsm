@@ -5,6 +5,6 @@ node_modules
 *.log
 
 /bin.js
-/index.js
+/utils.js
 /require.js
 /loader.mjs

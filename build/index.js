@@ -2,6 +2,9 @@ const { build } = require('esbuild');
 const pkg = require('../package.json');
 
 (async function () {
+	/**
+	 * @type {import('esbuild').BuildOptions}
+	 */
 	let shared = {
 		logLevel: 'info',
 		charset: 'utf8',
@@ -19,20 +22,20 @@ const pkg = require('../package.json');
 
 	await build({
 		...shared,
-		entryPoints: ['src/index.ts'],
-		outfile: pkg.exports['.'],
+		entryPoints: ['src/utils.ts'],
+		outfile: './utils.js',
 	});
 
 	await build({
 		...shared,
 		entryPoints: ['src/require.ts'],
-		outfile: pkg.exports['./register'].require,
+		outfile: pkg.exports['.'].require,
 	});
 
 	await build({
 		...shared,
 		entryPoints: ['src/loader.ts'],
-		outfile: pkg.exports['./loader'].import,
+		outfile: pkg.exports['.'].import,
 	});
 })().catch(err => {
 	console.error(err.stack || err);
