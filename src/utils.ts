@@ -3,11 +3,10 @@ const { existsSync } = require('fs');
 
 import type { Format } from 'esbuild';
 import type * as tsm from 'tsm/config';
+import type { Defaults } from './utils.d';
 
-exports.$defaults = function (format?: Format): {
-	file: string | false,
-	options: tsm.Options,
-} {
+
+exports.$defaults = function (format: Format): Defaults {
 	let { FORCE_COLOR, NO_COLOR, NODE_DISABLE_COLORS, TERM } = process.env;
 
 	let argv = process.argv.slice(2);
@@ -25,6 +24,7 @@ exports.$defaults = function (format?: Format): {
 
 	return {
 		file: existsSync(file) && file,
+		isESM: format === 'esm',
 		options: {
 			format: format,
 			charset: 'utf8',
@@ -36,7 +36,8 @@ exports.$defaults = function (format?: Format): {
 	};
 };
 
-exports.$finalize = function (base: tsm.Options, custom?: tsm.ConfigFile): tsm.Config {
+exports.$finalize = function (env: Defaults, custom?: tsm.ConfigFile): tsm.Config {
+	let base = env.options;
 	if (custom && custom.common) {
 		Object.assign(base, custom.common!);
 		delete custom.common; // loop below
@@ -45,9 +46,12 @@ exports.$finalize = function (base: tsm.Options, custom?: tsm.ConfigFile): tsm.C
 	let config: tsm.Config = {
 		'.jsx': { ...base, loader: 'jsx' },
 		'.tsx': { ...base, loader: 'tsx' },
-		'.mjs': { ...base, loader: 'js' }, // todo: remove?
 		'.ts': { ...base, loader: 'ts' },
 	};
+
+	if (!env.isESM) {
+		config['.mjs'] = { ...base, loader: 'js' };
+	}
 
 	let extn: tsm.Extension;
 	if (custom && custom.loaders) {

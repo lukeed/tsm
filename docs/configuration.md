@@ -33,6 +33,9 @@ let config = {
 }
 ```
 
+When using tsm through a [`--require` hook](/docs/usage.md#require-hook), then tsm also intercepts all `.mjs` files loaded via the `require()` method.
+
+
 ## Config File
 
 When a `tsm.js` file exists in the current working directory ([`process.cwd()`](https://nodejs.org/api/process.html#process_process_cwd)), it's automatically loaded and merged with the [tsm default configuration](#defaults).

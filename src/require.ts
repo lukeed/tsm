@@ -2,6 +2,7 @@ const { extname } = require('path');
 const tsm = require('./utils');
 
 import type { Config } from 'tsm/config';
+type TSM = typeof import('./utils.d');
 
 type Module = NodeJS.Module & {
 	_compile?(source: string, filename: string): typeof loader;
@@ -10,8 +11,9 @@ type Module = NodeJS.Module & {
 const loadJS = require.extensions['.js'];
 
 let esbuild: typeof import('esbuild');
-let { file, options } = tsm.$defaults('cjs');
-let config: Config = tsm.$finalize(options, file && require(file));
+let env = (tsm as TSM).$defaults('cjs');
+let uconf = env.file && require(env.file);
+let config: Config = (tsm as TSM).$finalize(env, uconf);
 
 function loader(Module: Module, sourcefile: string) {
 	let extn = extname(sourcefile);

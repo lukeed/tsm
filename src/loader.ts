@@ -39,7 +39,7 @@ type Transform = (
 async function load(): Promise<Config> {
 	let mod = await setup;
 	mod = mod && mod.default || mod;
-	return (tsm as TSM).$finalize(env.options, mod);
+	return (tsm as TSM).$finalize(env, mod);
 }
 
 const EXTN = /\.\w+(?=\?|$)/;
@@ -78,6 +78,7 @@ export const transformSource: Transform = async function (source, context, xform
 	let options = await toOptions(context.url);
 	if (options == null) return xform(source, context, xform);
 
+	// TODO: decode SAB/U8 correctly
 	esbuild = esbuild || await import('esbuild');
 	let result = await esbuild.transform(source.toString(), {
 		...options,
