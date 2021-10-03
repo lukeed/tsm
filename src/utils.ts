@@ -1,7 +1,7 @@
 const { resolve } = require('path');
 const { existsSync } = require('fs');
 
-import type { Format, LogLevel } from 'esbuild';
+import type { Format } from 'esbuild';
 import type * as tsm from 'tsm/config';
 
 exports.$defaults = function (format?: Format): {
@@ -13,17 +13,15 @@ exports.$defaults = function (format?: Format): {
 	let argv = process.argv.slice(2);
 
 	let flags = new Set(argv);
-	let idx = flags.has('--config') ? argv.indexOf('--config') : -1;
-	let file = resolve('.', !!~idx && argv[++idx] || 'tsm.js');
+	let isQuiet = flags.has('-q') || flags.has('--quiet');
 
 	// @see lukeed/kleur
 	let enabled = !NODE_DISABLE_COLORS && NO_COLOR == null && TERM !== 'dumb' && (
 		FORCE_COLOR != null && FORCE_COLOR !== '0' || process.stdout.isTTY
 	);
 
-	let level: LogLevel = (flags.has('-q')||flags.has('--quiet')) ? 'silent'
-		: (flags.has('-V')||flags.has('--verbose')) ? 'verbose'
-		: 'warning';
+	let idx = flags.has('--config') ? argv.indexOf('--config') : -1;
+	let file = resolve('.', !!~idx && argv[++idx] || 'tsm.js');
 
 	return {
 		file: existsSync(file) && file,
@@ -32,7 +30,7 @@ exports.$defaults = function (format?: Format): {
 			charset: 'utf8',
 			sourcemap: 'inline',
 			target: 'node' + process.versions.node,
-			logLevel: level,
+			logLevel: isQuiet ? 'silent' : 'warning',
 			color: enabled,
 		}
 	};
