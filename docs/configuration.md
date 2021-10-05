@@ -29,6 +29,8 @@ Additionally, tsm defines a few extensions by default, each of which is assigned
 let config = {
   '.jsx': { ...options, loader: 'jsx' },
   '.tsx': { ...options, loader: 'tsx' },
+  '.mts': { ...options, loader: 'ts' },
+  '.cts': { ...options, loader: 'ts' },
   '.ts': { ...options, loader: 'ts' },
 }
 ```

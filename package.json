@@ -33,7 +33,7 @@
     "types": "tsc"
   },
   "dependencies": {
-    "esbuild": "^0.13.3"
+    "esbuild": "^0.13.4"
   },
   "devDependencies": {
     "@types/node": "16.10.2",
