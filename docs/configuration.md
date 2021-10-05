@@ -35,6 +35,8 @@ let config = {
 
 When using tsm through a [`--require` hook](/docs/usage.md#require-hook), then tsm also intercepts all `.mjs` files loaded via the `require()` method.
 
+With CLI and/or `--loader` usage, tsm also handles `.json` files, which allows you to `import` or `import()` a JSON file.
+
 
 ## Config File
 

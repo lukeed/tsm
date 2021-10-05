@@ -49,7 +49,9 @@ exports.$finalize = function (env: Defaults, custom?: tsm.ConfigFile): tsm.Confi
 		'.ts': { ...base, loader: 'ts' },
 	};
 
-	if (!env.isESM) {
+	if (env.isESM) {
+		config['.json'] = { ...base, loader: 'json' };
+	} else {
 		config['.mjs'] = { ...base, loader: 'js' };
 	}
 
