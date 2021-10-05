@@ -43,8 +43,10 @@ exports.$finalize = function (env: Defaults, custom?: tsm.ConfigFile): tsm.Confi
 	}
 
 	let config: tsm.Config = {
+		'.mts': { ...base, loader: 'ts' },
 		'.jsx': { ...base, loader: 'jsx' },
 		'.tsx': { ...base, loader: 'tsx' },
+		'.cts': { ...base, loader: 'ts' },
 		'.ts': { ...base, loader: 'ts' },
 	};
 
