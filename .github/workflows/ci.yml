@@ -33,11 +33,11 @@ jobs:
     - name: Type Checks
       run: pnpm run types
 
-    - name: Tests :: ESM
+    - name: Tests <~ ESM
       run: node --loader ./loader.mjs test/index.mjs
 
-    - name: Tests :: CommonJS
+    - name: Tests <~ CommonJS
       run: node -r ./require.js test/index.js
 
-    - name: Tests :: TS w/ Config
+    - name: Tests <~ TS w/ Config
       run: node --loader ./loader.mjs test/config/index.ts --tsmconfig test/config/tsm.js
