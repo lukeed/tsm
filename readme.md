@@ -17,7 +17,7 @@
   </a>
 </div>
 
-<div align="center">TypeScript Modules</div>
+<div align="center">TypeScript Module Loader</div>
 
 ## Features
 
@@ -34,7 +34,7 @@
 # install as project dependency
 $ npm install --save-dev tsm
 
-# install globally
+# or install globally
 $ npm install --global tsm
 ```
 
