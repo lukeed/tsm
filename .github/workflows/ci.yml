@@ -36,8 +36,11 @@ jobs:
     - name: Tests <~ ESM
       run: node --loader ./loader.mjs test/index.mjs
 
+    - name: Tests <~ ESM <~ TypeScript
+      run: node --loader ./loader.mjs test/config/index.ts --tsmconfig test/config/tsm.js
+
     - name: Tests <~ CommonJS
       run: node -r ./require.js test/index.js
 
-    - name: Tests <~ TS w/ Config
-      run: node --loader ./loader.mjs test/config/index.ts --tsmconfig test/config/tsm.js
+    - name: Tests <~ CommonJS <~ TypeScript
+      run: node -r ./require.js test/config/index.ts --tsmconfig test/config/tsm.js
