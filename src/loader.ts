@@ -2,7 +2,7 @@ import * as url from 'url';
 import { existsSync } from 'fs';
 import * as tsm from './utils.js';
 
-import type { Config, Options } from 'tsm/config';
+import type { Config, Extension, Options } from 'tsm/config';
 type TSM = typeof import('./utils.d');
 
 let config: Config;
@@ -43,10 +43,17 @@ async function load(): Promise<Config> {
 }
 
 const EXTN = /\.\w+(?=\?|$)/;
+const isTS = /\.[mc]?tsx?(?=\?|$)/;
+const isJS = /\.([mc])?js$/;
 async function toOptions(uri: string): Promise<Options|void> {
 	config = config || await load();
 	let [extn] = EXTN.exec(uri) || [];
 	return config[extn as `.${string}`];
+}
+
+function check(fileurl: string): string | void {
+	let tmp = url.fileURLToPath(fileurl);
+	if (existsSync(tmp)) return fileurl;
 }
 
 const root = url.pathToFileURL(process.cwd() + '/');
@@ -54,15 +61,41 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 	// ignore "prefix:" and non-relative identifiers
 	if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
 
+	let match: RegExpExecArray | null;
+	let idx: number, ext: Extension, path: string | void;
 	let output = new url.URL(ident, context.parentURL || root);
-	if (EXTN.test(output.pathname)) return { url: output.href };
+
+	// source ident includes extension
+	if (match = EXTN.exec(output.href)) {
+		ext = match[0] as Extension;
+		if (!context.parentURL || isTS.test(ext)) {
+			return { url: output.href };
+		}
+		// source ident exists
+		path = check(output.href);
+		if (path) return { url: path };
+		// parent importer is a ts file
+		// source ident is js & NOT exists
+		if (isJS.test(ext) && isTS.test(context.parentURL)) {
+			// reconstruct ".js" -> ".ts" source file
+			path = output.href.substring(0, idx = match.index);
+			if (path = check(path + ext.replace('js', 'ts'))) {
+				idx += ext.length;
+				if (idx > output.href.length) {
+					path += output.href.substring(idx);
+				}
+				return { url: path };
+			}
+			// return original, let it error
+			return fallback(ident, context, fallback);
+		}
+	}
 
 	config = config || await load();
 
-	let tmp, ext, path;
 	for (ext in config) {
-		path = url.fileURLToPath(tmp = output.href + ext);
-		if (existsSync(path)) return { url: tmp };
+		path = check(output.href + ext);
+		if (path) return { url: path };
 	}
 
 	return fallback(ident, context, fallback);

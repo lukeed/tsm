@@ -5,7 +5,6 @@ import type { Format } from 'esbuild';
 import type * as tsm from 'tsm/config';
 import type { Defaults } from './utils.d';
 
-
 exports.$defaults = function (format: Format): Defaults {
 	let { FORCE_COLOR, NO_COLOR, NODE_DISABLE_COLORS, TERM } = process.env;
 
