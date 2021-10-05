@@ -16,9 +16,10 @@ let uconf = env.file && require(env.file);
 let config: Config = (tsm as TSM).$finalize(env, uconf);
 
 declare const $$req: NodeJS.Require;
-const tsrequire = 'var $$req=require.bind(require);' + function $$trap(src: string) {
+const tsrequire = 'var $$req=require;require=(' + function () {
 	let { existsSync } = $$req('fs');
 	let { URL, pathToFileURL } = $$req('url');
+
 	return new Proxy($$req, {
 		// NOTE: only here if source is TS
 		apply(req, ctx, args: [id: string]) {
@@ -32,7 +33,7 @@ const tsrequire = 'var $$req=require.bind(require);' + function $$trap(src: stri
 			let match = /\.([mc])?js(?=\?|$)/.exec(ident);
 			if (match == null) return $$req(ident);
 
-			let base = pathToFileURL(src) as import('url').URL;
+			let base = pathToFileURL(__filename) as import('url').URL;
 			let file = new URL(ident, base).pathname as string;
 			if (existsSync(file)) return $$req(ident);
 
@@ -46,7 +47,7 @@ const tsrequire = 'var $$req=require.bind(require);' + function $$trap(src: stri
 			return existsSync(file) ? $$req(file) : $$req(ident);
 		}
 	})
-};
+} + ')();'
 
 function loader(Module: Module, sourcefile: string) {
 	let extn = extname(sourcefile);
@@ -58,7 +59,7 @@ function loader(Module: Module, sourcefile: string) {
 
 		let banner = options.banner || '';
 		if (/\.[mc]?tsx?$/.test(extn)) {
-			banner = tsrequire + `require=$$trap(${ JSON.stringify(sourcefile) });` + banner;
+			banner = tsrequire + banner;
 		}
 
 		esbuild = esbuild || require('esbuild');
