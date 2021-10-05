@@ -17,6 +17,7 @@
     "module": "esnext",
     "checkJs": true,
     "noEmit": true,
+    "jsx": "react",
     "paths": {
       "tsm/config": ["./config/index.d.ts"]
     }
