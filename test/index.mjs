@@ -38,3 +38,5 @@ assert.equal(typeof ts.sum, 'function', 'TS :: typeof :: sum');
 assert.equal(typeof ts.div, 'function', 'TS :: typeof :: div');
 assert.equal(typeof ts.mul, 'function', 'TS :: typeof :: mul');
 assert.equal(ts.foobar, 3, 'TS :: value :: foobar');
+
+console.log('DONE~!');
