@@ -30,7 +30,7 @@
   },
   "scripts": {
     "build": "node build",
-    "test": "tsc"
+    "types": "tsc"
   },
   "dependencies": {
     "esbuild": "^0.13.3"
