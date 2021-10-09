@@ -6,6 +6,8 @@ import * as js from '../fixtures/math.js';
 import * as mjs from '../fixtures/utils.mjs';
 // @ts-ignore - cannot find types
 import * as cjs from '../fixtures/utils.cjs';
+// @ts-ignore - cannot find types
+import * as esm from '../fixtures/module/index.js';
 
 // NOTE: avoid need for syntheticDefault + analysis
 import * as data from '../fixtures/data.json';
@@ -30,5 +32,12 @@ assert.equal(mjs.capitalize('hello'), 'Hello', 'MJS :: value :: capitalize');
 assert.equal(typeof cjs, 'object', 'CJS :: typeof');
 assert.equal(typeof cjs.dashify, 'function', 'CJS :: typeof :: dashify');
 assert.equal(cjs.dashify('FooBar'), 'foo-bar', 'CJS :: value :: dashify');
+
+// Checking ".js" with ESM content (type: module)
+assert.equal(typeof esm, 'object', 'ESM.js :: typeof');
+// @ts-ignore
+assert.equal(typeof esm.hello, 'function', 'ESM.js :: typeof :: hello');
+// @ts-ignore
+assert.equal(esm.hello('you'), 'hello, you', 'ESM.js :: value :: hello');
 
 console.log('DONE~!');
