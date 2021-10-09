@@ -23,17 +23,14 @@ jobs:
       with:
         node-version: ${{ matrix.nodejs }}
 
-    - name: (env) pnpm
-      run: curl -L https://raw.githubusercontent.com/pnpm/self-installer/master/install.js | node
-
     - name: Install
-      run: pnpm install
+      run: npm install
 
     - name: Compiles
-      run: pnpm run build
+      run: npm run build
 
     - name: Type Checks
-      run: pnpm run types
+      run: npm run types
 
     - name: Tests <~ ESM
       run: node --loader ./loader.mjs test/index.mjs
