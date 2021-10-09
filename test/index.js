@@ -11,6 +11,10 @@ const ts = require('./fixtures/math.ts');
 const mts = require('./fixtures/utils.mts');
 // @ts-ignore – prefers extensionless
 const cts = require('./fixtures/utils.cts');
+// @ts-ignore – prefers extensionless
+const esm1 = require('./fixtures/module/index.js');
+// @ts-ignore – prefers extensionless
+const esm2 = require('./fixtures/module/index.mjs');
 
 const props = {
 	foo: 'bar'
@@ -54,5 +58,15 @@ assert(cts, 'CTS :: typeof');
 assert.equal(typeof cts, 'object', 'CTS :: typeof');
 assert.equal(typeof cts.dashify, 'function', 'CTS :: typeof :: dashify');
 assert.equal(cts.dashify('FooBar'), 'foo-bar', 'CTS :: value :: dashify');
+
+assert(esm1, 'ESM.js :: typeof');
+assert.equal(typeof esm1, 'object', 'ESM.js :: typeof');
+assert.equal(typeof esm1.hello, 'function', 'ESM.js :: typeof :: hello');
+assert.equal(esm1.hello('you'), 'hello, you', 'ESM.js :: value :: hello');
+
+assert(esm2, 'ESM.mjs :: typeof');
+assert.equal(typeof esm2, 'object', 'ESM.mjs :: typeof');
+assert.equal(typeof esm2.hello, 'function', 'ESM.mjs :: typeof :: hello');
+assert.equal(esm2.hello('you'), 'hello, you', 'ESM.mjs :: value :: hello');
 
 console.log('DONE~!');
