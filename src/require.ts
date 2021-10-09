@@ -17,11 +17,11 @@ let uconf = env.file && require(env.file);
 let config: Config = (tsm as TSM).$finalize(env, uconf);
 
 declare const $$req: NodeJS.Require;
-const tsrequire = 'var $$req=require;require=(' + function () {
+const tsrequire = 'var $$req=require("module").createRequire(__filename);require=(' + function () {
 	let { existsSync } = $$req('fs');
 	let { URL, pathToFileURL } = $$req('url');
 
-	return new Proxy($$req, {
+	return new Proxy(require, {
 		// NOTE: only here if source is TS
 		apply(req, ctx, args: [id: string]) {
 			let [ident] = args;
