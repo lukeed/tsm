@@ -9,7 +9,7 @@ let config: Config;
 let esbuild: typeof import('esbuild');
 
 let env = (tsm as TSM).$defaults('esm');
-let setup = env.file && import(env.file);
+let setup = env.file && import('file:///' + env.file);
 
 type Promisable<T> = Promise<T> | T;
 type Source = string | SharedArrayBuffer | Uint8Array;
