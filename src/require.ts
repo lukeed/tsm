@@ -50,15 +50,16 @@ const tsrequire = 'var $$req=require;require=(' + function () {
 	})
 } + ')();';
 
-function transform(source: string, sourcefile: string, options: Options): string {
+function transform(source: string, options: Options): string {
 	esbuild = esbuild || require('esbuild');
-	return esbuild.transformSync(source, { ...options, sourcefile }).code;
+	return esbuild.transformSync(source, options).code;
 }
 
 function loader(Module: Module, sourcefile: string) {
 	let extn = extname(sourcefile);
 	let options = config[extn] || {};
 	let pitch = Module._compile!.bind(Module);
+	options.sourcefile = sourcefile;
 
 	if (/\.[mc]?tsx?$/.test(extn)) {
 		options.banner = tsrequire + (options.banner || '');
@@ -66,7 +67,7 @@ function loader(Module: Module, sourcefile: string) {
 
 	if (config[extn] != null) {
 		Module._compile = source => {
-			let result = transform(source, sourcefile, options);
+			let result = transform(source, options);
 			return pitch(result, sourcefile);
 		};
 	}
@@ -78,10 +79,7 @@ function loader(Module: Module, sourcefile: string) {
 		if (ec !== 'ERR_REQUIRE_ESM') throw err;
 
 		let input = readFileSync(sourcefile, 'utf8');
-		let result = transform(input, sourcefile, {
-			...options, format: 'cjs'
-		});
-
+		let result = transform(input, { ...options, format: 'cjs' });
 		return pitch(result, sourcefile);
 	}
 }
