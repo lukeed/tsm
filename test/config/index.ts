@@ -35,9 +35,7 @@ assert.equal(cjs.dashify('FooBar'), 'foo-bar', 'CJS :: value :: dashify');
 
 // Checking ".js" with ESM content (type: module)
 assert.equal(typeof esm, 'object', 'ESM.js :: typeof');
-// @ts-ignore
 assert.equal(typeof esm.hello, 'function', 'ESM.js :: typeof :: hello');
-// @ts-ignore
 assert.equal(esm.hello('you'), 'hello, you', 'ESM.js :: value :: hello');
 
 console.log('DONE~!');
