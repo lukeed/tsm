@@ -11,6 +11,10 @@ import * as cts from './fixtures/utils.cts';
 import * as ts from './fixtures/math.ts';
 // @ts-ignore – prefers extensionless
 import tsx from './fixtures/App2.tsx';
+// @ts-ignore – prefers extensionless
+import * as esm1 from './fixtures/module/index.js';
+// @ts-ignore – prefers extensionless
+import * as esm2 from './fixtures/module/index.mjs';
 
 const props = {
 	foo: 'bar'
@@ -52,5 +56,13 @@ assert.equal(mts.capitalize('hello'), 'Hello', 'MTS :: value :: capitalize');
 assert.equal(typeof cts, 'object', 'CTS :: typeof');
 assert.equal(typeof cts.dashify, 'function', 'CTS :: typeof :: dashify');
 assert.equal(cts.dashify('FooBar'), 'foo-bar', 'CTS :: value :: dashify');
+
+assert.equal(typeof esm1, 'object', 'ESM.js :: typeof');
+assert.equal(typeof esm1.hello, 'function', 'ESM.js :: typeof :: hello');
+assert.equal(esm1.hello('you'), 'hello, you', 'ESM.js :: value :: hello');
+
+assert.equal(typeof esm2, 'object', 'ESM.mjs :: typeof');
+assert.equal(typeof esm2.hello, 'function', 'ESM.mjs :: typeof :: hello');
+assert.equal(esm2.hello('you'), 'hello, you', 'ESM.mjs :: value :: hello');
 
 console.log('DONE~!');

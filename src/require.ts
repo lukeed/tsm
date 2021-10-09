@@ -1,7 +1,8 @@
 const { extname } = require('path');
+const { readFileSync } = require('fs');
 const tsm = require('./utils');
 
-import type { Config } from 'tsm/config';
+import type { Config, Options } from 'tsm/config';
 type TSM = typeof import('./utils.d');
 
 type Module = NodeJS.Module & {
@@ -47,29 +48,51 @@ const tsrequire = 'var $$req=require;require=(' + function () {
 			return existsSync(file) ? $$req(file) : $$req(ident);
 		}
 	})
-} + ')();'
+} + ')();';
+
+function transform(source: string, sourcefile: string, options: Options): string {
+	let banner = options.banner || '';
+	if (/\.[mc]?tsx?$/.test(sourcefile)) {
+		banner = tsrequire + banner;
+	}
+
+	esbuild = esbuild || require('esbuild');
+	return esbuild.transformSync(source, {
+		...options, banner, sourcefile
+	}).code;
+}
 
 function loader(Module: Module, sourcefile: string) {
-	let extn = extname(sourcefile);
 	let pitch = Module._compile!.bind(Module);
+	let extn = extname(sourcefile);
+	let options = config[extn];
 
-	Module._compile = source => {
-		let options = config[extn];
-		if (options == null) return pitch(source, sourcefile);
+	if (options != null) {
+		Module._compile = source => {
+			let result = transform(source, sourcefile, options);
+			return pitch(result, sourcefile);
+		};
+	}
 
-		let banner = options.banner || '';
-		if (/\.[mc]?tsx?$/.test(extn)) {
-			banner = tsrequire + banner;
-		}
+	try {
+		return loadJS(Module, sourcefile);
+	} catch (err) {
+		let ec = err && (err as any).code;
+		if (ec !== 'ERR_REQUIRE_ESM') throw err;
 
-		esbuild = esbuild || require('esbuild');
-		let result = esbuild.transformSync(source, { ...options, banner, sourcefile });
-		return pitch(result.code, sourcefile);
-	};
+		let input = readFileSync(sourcefile, 'utf8');
+		let result = transform(input, sourcefile, {
+			...options, format: 'cjs'
+		});
 
-	return loadJS(Module, sourcefile);
+		return pitch(result, sourcefile);
+	}
 }
 
 for (let extn in config) {
 	require.extensions[extn] = loader;
+}
+
+if (config['.js'] == null) {
+	require.extensions['.js'] = loader;
 }
