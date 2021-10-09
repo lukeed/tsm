@@ -44,3 +44,9 @@ jobs:
 
     - name: Tests <~ CommonJS <~ TypeScript
       run: node -r ./require.js test/config/index.ts --tsmconfig test/config/tsm.js
+
+    - name: Tests <~ CLI
+      run: node bin.js test/index.mjs
+
+    - name: Tests <~ CLI <~ TypeScript
+      run: node bin.js test/config/index.ts --tsmconfig test/config/tsm.js
