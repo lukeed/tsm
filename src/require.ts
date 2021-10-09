@@ -51,23 +51,20 @@ const tsrequire = 'var $$req=require;require=(' + function () {
 } + ')();';
 
 function transform(source: string, sourcefile: string, options: Options): string {
-	let banner = options.banner || '';
-	if (/\.[mc]?tsx?$/.test(sourcefile)) {
-		banner = tsrequire + banner;
-	}
-
 	esbuild = esbuild || require('esbuild');
-	return esbuild.transformSync(source, {
-		...options, banner, sourcefile
-	}).code;
+	return esbuild.transformSync(source, { ...options, sourcefile }).code;
 }
 
 function loader(Module: Module, sourcefile: string) {
-	let pitch = Module._compile!.bind(Module);
 	let extn = extname(sourcefile);
-	let options = config[extn];
+	let options = config[extn] || {};
+	let pitch = Module._compile!.bind(Module);
 
-	if (options != null) {
+	if (/\.[mc]?tsx?$/.test(extn)) {
+		options.banner = tsrequire + (options.banner || '');
+	}
+
+	if (config[extn] != null) {
 		Module._compile = source => {
 			let result = transform(source, sourcefile, options);
 			return pitch(result, sourcefile);
