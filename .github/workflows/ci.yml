@@ -10,28 +10,27 @@ on:
 
 jobs:
   test:
-    name: Node.js v${{ matrix.nodejs }}
-    runs-on: ubuntu-latest
+    name: Node.js v${{ matrix.nodejs }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 3
     strategy:
       matrix:
         nodejs: [12, 14, 16]
+        os: [ubuntu-latest, windows-latest]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.nodejs }}
 
-    - name: (env) pnpm
-      run: curl -L https://raw.githubusercontent.com/pnpm/self-installer/master/install.js | node
-
     - name: Install
-      run: pnpm install
+      run: npm install
 
     - name: Compiles
-      run: pnpm run build
+      run: npm run build
 
     - name: Type Checks
-      run: pnpm run types
+      run: npm run types
 
     - name: Tests <~ ESM
       run: node --loader ./loader.mjs test/index.mjs
@@ -44,3 +43,9 @@ jobs:
 
     - name: Tests <~ CommonJS <~ TypeScript
       run: node -r ./require.js test/config/index.ts --tsmconfig test/config/tsm.js
+
+    - name: Tests <~ CLI
+      run: node bin.js test/index.mjs
+
+    - name: Tests <~ CLI <~ TypeScript
+      run: node bin.js test/config/index.ts --tsmconfig test/config/tsm.js

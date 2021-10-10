@@ -27,7 +27,5 @@ if (argv.includes('-v') || argv.includes('--version')) {
 	process.exit(0);
 }
 
-let file = require('path').join(__dirname, 'loader.mjs');
-require('child_process').spawn('node', ['--loader', file, ...argv], {
-	stdio: 'inherit'
-}).on('exit', process.exit);
+argv = ['--loader', './loader.mjs', ...argv];
+require('child_process').spawn('node', argv, { stdio: 'inherit' }).on('exit', process.exit);

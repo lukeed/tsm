@@ -1,5 +1,5 @@
-import * as url from 'url';
 import { existsSync } from 'fs';
+import { fileURLToPath, URL } from 'url';
 import * as tsm from './utils.js';
 
 import type { Config, Extension, Options } from 'tsm/config';
@@ -9,7 +9,7 @@ let config: Config;
 let esbuild: typeof import('esbuild');
 
 let env = (tsm as TSM).$defaults('esm');
-let setup = env.file && import(env.file);
+let setup = env.file && import('file:///' + env.file);
 
 type Promisable<T> = Promise<T> | T;
 type Source = string | SharedArrayBuffer | Uint8Array;
@@ -52,18 +52,18 @@ async function toOptions(uri: string): Promise<Options|void> {
 }
 
 function check(fileurl: string): string | void {
-	let tmp = url.fileURLToPath(fileurl);
+	let tmp = fileURLToPath(fileurl);
 	if (existsSync(tmp)) return fileurl;
 }
 
-const root = url.pathToFileURL(process.cwd() + '/');
+const root = new URL('file:///' + process.cwd() + '/');
 export const resolve: Resolve = async function (ident, context, fallback) {
 	// ignore "prefix:" and non-relative identifiers
 	if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
 
 	let match: RegExpExecArray | null;
 	let idx: number, ext: Extension, path: string | void;
-	let output = new url.URL(ident, context.parentURL || root);
+	let output = new URL(ident, context.parentURL || root);
 
 	// source ident includes extension
 	if (match = EXTN.exec(output.href)) {

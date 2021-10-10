@@ -18,8 +18,8 @@ let config: Config = (tsm as TSM).$finalize(env, uconf);
 
 declare const $$req: NodeJS.Require;
 const tsrequire = 'var $$req=require("module").createRequire(__filename);require=(' + function () {
-	let { existsSync } = $$req('fs');
-	let { URL, pathToFileURL } = $$req('url');
+	let { existsSync } = $$req('fs') as typeof import('fs');
+	let $url = $$req('url') as typeof import('url');
 
 	return new Proxy(require, {
 		// NOTE: only here if source is TS
@@ -34,8 +34,8 @@ const tsrequire = 'var $$req=require("module").createRequire(__filename);require
 			let match = /\.([mc])?js(?=\?|$)/.exec(ident);
 			if (match == null) return $$req(ident);
 
-			let base = pathToFileURL(__filename) as import('url').URL;
-			let file = new URL(ident, base).pathname as string;
+			let base = $url.pathToFileURL(__filename);
+			let file = $url.fileURLToPath(new $url.URL(ident, base));
 			if (existsSync(file)) return $$req(ident);
 
 			// ?js -> ?ts file
