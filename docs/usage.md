@@ -5,7 +5,7 @@ There are a number of ways you can use tsm in your project:
 1. As a `node` CLI replacement
 2. As a CommonJS [`--require`](https://nodejs.org/api/cli.html#cli_r_require_module) hook
 3. As an ESM [`--loader`](https://nodejs.org/api/esm.html#esm_loaders)
-4. As a [bash shebang](https://linuxize.com/post/bash-shebang/) interpreter
+4. As a [shell shebang](https://linuxize.com/post/bash-shebang/) interpreter
 
 ## CLI
 
@@ -66,9 +66,9 @@ $ node --loader tsm server.tsx
 $ node --experimental-loader tsm main.ts
 ```
 
-## Bash / Shebang
+## Shell / Shebang
 
-If you have `tsm` installed globally on your system, you may write bash scripts with tsm as the interpreter. Here's an example:
+If you have `tsm` installed globally on your system, you may write shell scripts with tsm as the interpreter. Here's an example:
 
 ```ts
 // file: example.ts
