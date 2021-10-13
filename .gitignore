@@ -4,7 +4,9 @@ node_modules
 *.lock
 *.log
 
-/bin.js
-/utils.js
-/require.js
-/loader.mjs
+dist/
+
+# /bin.js
+# /utils.js
+# /require.js
+# /loader.mjs

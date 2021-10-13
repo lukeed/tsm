@@ -23,9 +23,9 @@
     }
   },
   "include": [
+    "src",
     "build",
     "test",
-    "src",
   ],
   "exclude": [
     "node_modules"

@@ -1,11 +1,12 @@
-const { build } = require('esbuild');
-const pkg = require('../package.json');
+#!/usr/bin/env tsm
 
-(async function () {
-	/**
-	 * @type {import('esbuild').BuildOptions}
-	 */
-	let shared = {
+import { build, BuildOptions } from 'esbuild'
+import { readFile } from 'fs/promises';
+
+const pkg = JSON.parse(await readFile('package.json', 'utf-8'));
+
+try {
+	let shared: BuildOptions = {
 		logLevel: 'info',
 		charset: 'utf8',
 		minify: true,
@@ -16,14 +17,14 @@ const pkg = require('../package.json');
 
 	await build({
 		...shared,
-		entryPoints: ['src/bin.ts'],
-		outfile: pkg.bin,
+		entryPoints: ['src/utils.ts'],
+		outfile: './dist/utils.js',
 	});
 
 	await build({
 		...shared,
-		entryPoints: ['src/utils.ts'],
-		outfile: './utils.js',
+		entryPoints: ['src/bin.ts'],
+		outfile: pkg.bin,
 	});
 
 	await build({
@@ -37,7 +38,8 @@ const pkg = require('../package.json');
 		entryPoints: ['src/loader.ts'],
 		outfile: pkg.exports['.'].import,
 	});
-})().catch(err => {
+
+} catch (err: any) {
 	console.error(err.stack || err);
 	process.exitCode = 1;
-});
+}
