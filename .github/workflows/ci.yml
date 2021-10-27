@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 3
     strategy:
       matrix:
-        nodejs: [12, 14, 16]
+        nodejs: [12, 14, 16.11, 16]
         os: [ubuntu-latest, windows-latest]
     steps:
     - uses: actions/checkout@v2

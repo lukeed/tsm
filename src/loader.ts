@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { existsSync, promises as fs } from 'fs';
 import { fileURLToPath, URL } from 'url';
 import * as tsm from './utils.js';
 
@@ -22,7 +22,10 @@ type Resolve = (
 		parentURL?: string;
 	},
 	fallback: Resolve
-) => Promisable<{ url: string }>;
+) => Promisable<{
+	url: string;
+	format?: Format;
+}>;
 
 type Inspect = (
 	url: string,
@@ -35,6 +38,15 @@ type Transform = (
 	context: Record<'url' | 'format', string>,
 	fallback: Transform
 ) => Promisable<{ source: Source }>;
+
+type Load = (
+	url: string,
+	context: { format?: Format },
+	fallback: Load
+) => Promisable<{
+	format: Format;
+	source: Source;
+}>;
 
 async function toConfig(): Promise<Config> {
 	let mod = await setup;
@@ -99,6 +111,27 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 	}
 
 	return fallback(ident, context, fallback);
+}
+
+export const load: Load = async function (uri, context, fallback) {
+	// note: inline `getFormat`
+	let options = await toOptions(uri);
+	if (options == null) return fallback(uri, context, fallback);
+	let format: Format = options.format === 'cjs' ? 'commonjs' : 'module';
+
+	// TODO: decode SAB/U8 correctly
+	let path = fileURLToPath(uri);
+	let source = await fs.readFile(path);
+
+	// note: inline `transformSource`
+	esbuild = esbuild || await import('esbuild');
+	let result = await esbuild.transform(source.toString(), {
+		...options,
+		sourcefile: path,
+		format: format === 'module' ? 'esm' : 'cjs',
+	});
+
+	return { format, source: result.code };
 }
 
 /** @deprecated */
