@@ -36,7 +36,7 @@ type Transform = (
 	fallback: Transform
 ) => Promisable<{ source: Source }>;
 
-async function load(): Promise<Config> {
+async function toConfig(): Promise<Config> {
 	let mod = await setup;
 	mod = mod && mod.default || mod;
 	return (tsm as TSM).$finalize(env, mod);
@@ -46,7 +46,7 @@ const EXTN = /\.\w+(?=\?|$)/;
 const isTS = /\.[mc]?tsx?(?=\?|$)/;
 const isJS = /\.([mc])?js$/;
 async function toOptions(uri: string): Promise<Options|void> {
-	config = config || await load();
+	config = config || await toConfig();
 	let [extn] = EXTN.exec(uri) || [];
 	return config[extn as `.${string}`];
 }
@@ -91,7 +91,7 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 		}
 	}
 
-	config = config || await load();
+	config = config || await toConfig();
 
 	for (ext in config) {
 		path = check(output.href + ext);
