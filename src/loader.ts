@@ -101,12 +101,14 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 	return fallback(ident, context, fallback);
 }
 
+/** @deprecated */
 export const getFormat: Inspect = async function (uri, context, fallback) {
 	let options = await toOptions(uri);
 	if (options == null) return fallback(uri, context, fallback);
 	return { format: options.format === 'cjs' ? 'commonjs' : 'module' };
 }
 
+/** @deprecated */
 export const transformSource: Transform = async function (source, context, xform) {
 	let options = await toOptions(context.url);
 	if (options == null) return xform(source, context, xform);
