@@ -1,6 +1,6 @@
 {
   "name": "tsm",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "repository": "lukeed/tsm",
   "description": "TypeScript Module Loader",
   "license": "MIT",
