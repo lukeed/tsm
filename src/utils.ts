@@ -28,7 +28,7 @@ exports.$defaults = function (format: Format): Defaults {
 			format: format,
 			charset: 'utf8',
 			sourcemap: 'inline',
-			target: 'node' + process.versions.node,
+			target: format ==='esm' ? ('node' + process.versions.node) : 'node12',
 			logLevel: isQuiet ? 'silent' : 'warning',
 			color: enabled,
 		}
