@@ -1,6 +1,6 @@
 {
   "name": "tsm",
-  "version": "2.1.2",
+  "version": "2.2.1",
   "repository": "lukeed/tsm",
   "description": "TypeScript Module Loader",
   "license": "MIT",
@@ -33,12 +33,12 @@
     "types": "tsc"
   },
   "dependencies": {
-    "esbuild": "^0.13.4"
+    "esbuild": "^0.14.0"
   },
   "devDependencies": {
-    "@types/node": "16.10.2",
-    "@types/react": "17.0.27",
-    "typescript": "4.4.3"
+    "@types/node": "16.11.6",
+    "@types/react": "17.0.33",
+    "typescript": "4.4.4"
   },
   "keywords": [
     "esm",
