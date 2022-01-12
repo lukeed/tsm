@@ -1,14 +1,13 @@
-#!/usr/bin/env tsm
-
 import { build as esbuild, BuildOptions } from "esbuild";
 import { readFile, rm } from "fs/promises";
+import chalk from "chalk";
 import glob from "fast-glob";
 import { resolve } from "path";
 
 export const build = async (production = false) => {
   try {
     if (production) {
-      console.log("Building for production...");
+      console.log(chalk.grey("Building for production..."));
     }
 
     const cwd = process.cwd();

@@ -62,8 +62,8 @@ export const resolve: ModuleResolver = async (specifier, context, defaultResolve
 
   const root = new URL("file:///" + process.cwd());
   const output = new URL(specifier, context.parentURL || root);
-  const specifierUrl = output.href;
-  const specifierExtension = extname(specifierUrl);
+  const specifierExtension = extname(output.href).replace(/\W\w+$/, "");
+  const specifierUrl = output.href.substring(0, output.href.lastIndexOf(specifierExtension));
 
   /**
    * Resolve TypeScript's bare import syntax.
