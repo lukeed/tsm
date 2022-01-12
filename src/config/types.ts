@@ -15,3 +15,8 @@ export type ConfigFile =
 export type Loaders = {
   [extension: Extension]: Loader;
 };
+
+export interface Defaults {
+  file: string | false;
+  options: Options;
+}

@@ -12,7 +12,7 @@ export const load = () => {
    * This will refer to the built loader regardless of whether it is running
    * from inside `dist/` or `src/`.
    */
-  const loaderUrl = new URL("../../dist/runtime/loader.js", __filename);
+  const loaderUrl = new URL("../../dist/loader/index.js", __filename);
 
   const nodeArgs = [
     "--loader",

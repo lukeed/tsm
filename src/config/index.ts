@@ -1,11 +1,6 @@
-import type { Config, ConfigFile, Extension, Options } from "../config";
+import type { Config, ConfigFile, Defaults, Extension } from "./types";
 import { existsSync } from "fs";
 import { resolve } from "path";
-
-export interface Defaults {
-  file: string | false;
-  options: Options;
-}
 
 export function initialize(): Defaults {
   const { FORCE_COLOR, NO_COLOR, NODE_DISABLE_COLORS, TERM } = process.env;
@@ -31,6 +26,7 @@ export function initialize(): Defaults {
       target: "node16",
       logLevel: isQuiet ? "silent" : "warning",
       color: enabled,
+      minify: false,
     }
   };
 }

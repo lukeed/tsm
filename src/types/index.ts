@@ -2,4 +2,5 @@ declare global {
   const PACKAGE_JSON: Record<string, unknown>;
 }
 
-export {};
+export * from "../config/types";
+export * from "../loader/types";

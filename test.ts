@@ -1,7 +1,4 @@
 #!/usr/bin/env tsm
 
-const a: string = 'hello world';
+const a = "hello world";
 console.log({ a });
-
-import * as test from './src/loader'
-console.log({ test });

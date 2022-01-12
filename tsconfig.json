@@ -16,23 +16,18 @@
     "alwaysStrict": true,
     "module": "esnext",
     "checkJs": true,
-    "noEmit": false,
+    "baseUrl": ".",
     "rootDir": "src",
     "outDir": "dist",
     "declaration": true,
     "emitDeclarationOnly": true,
     "jsx": "preserve",
-    "baseUrl": ".",
-    "paths": {
-      "tsm/config": ["src/config"]
-    }
   },
   "include": [
-    "src",
-    "build",
-    "test",
+    "src/**/*",
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }
