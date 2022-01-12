@@ -1,7 +1,7 @@
 import { URL } from "url";
 import { spawn } from "child_process";
 
-export const load = () => {
+export const execute = () => {
   /**
    * Silence experimental warnings.
    */

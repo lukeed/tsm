@@ -2,7 +2,7 @@
 
 import { Command } from "commander";
 import { build } from "./commands/build";
-import { load } from "./commands/load";
+import { execute } from "./commands/execute";
 
 if (process.argv.length >= 2) {
   const program = new Command();
@@ -14,9 +14,9 @@ if (process.argv.length >= 2) {
     .action(async ({ dev }) => await build(!dev));
 
   program
-    .command("load <file>", { isDefault: true })
-    .description("Execute the given TS program, analogous to `node <file>`.")
-    .action(load);
+    .command("execute <file>", { isDefault: true })
+    .description("Run the given TS program, analogous to `node <file>`.")
+    .action(execute);
   // .action(async () => {
   //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //   //@ts-ignore Need to force the dist runtime.
