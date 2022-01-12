@@ -33,10 +33,10 @@ jobs:
       run: npm run types
 
     - name: Tests <~ ESM
-      run: node --loader ./loader.mjs test/index.mjs
+      run: node --loader ./loader.js test/index.mjs
 
     - name: Tests <~ ESM <~ TypeScript
-      run: node --loader ./loader.mjs test/config/index.ts --tsmconfig test/config/tsm.js
+      run: node --loader ./loader.js test/config/index.ts --tsmconfig test/config/tsm.js
 
     - name: Tests <~ CommonJS
       run: node -r ./require.js test/index.js

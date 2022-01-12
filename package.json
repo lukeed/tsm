@@ -1,5 +1,6 @@
 {
   "name": "tsm",
+  "type": "module",
   "version": "2.2.1",
   "repository": "lukeed/tsm",
   "description": "TypeScript Module Loader",
@@ -11,10 +12,7 @@
     "url": "https://lukeed.com"
   },
   "exports": {
-    ".": {
-      "import": "./dist/loader.mjs",
-      "require": "./dist/require.js"
-    },
+    ".": "./dist/loader.js",
     "./config": "./config/index.js",
     "./package.json": "./package.json"
   },
@@ -22,24 +20,28 @@
     "bin.js",
     "utils.js",
     "require.js",
-    "loader.mjs",
+    "loader.js",
     "config"
   ],
   "engines": {
     "node": ">=16"
   },
   "scripts": {
-    "bootstrap": "node src/build/bootstrap.js",
+    "bootstrap": "esbuild src/build/index.ts --target=es2021 --outfile=dist/bootstrap.js && node dist/bootstrap.js",
     "prebuild": "yarn bootstrap",
     "build": "./src/build/index.ts",
     "types": "tsc"
   },
   "dependencies": {
-    "esbuild": "^0.14.0"
+    "esbuild": "^0.14.0",
+    "fast-glob": "^3.2.10"
   },
   "devDependencies": {
     "@types/node": "16.11.6",
     "@types/react": "17.0.33",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
+    "eslint": "^8.6.0",
     "typescript": "4.4.4"
   },
   "keywords": [
