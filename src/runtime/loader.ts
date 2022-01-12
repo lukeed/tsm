@@ -2,12 +2,13 @@ import { existsSync, promises as fs } from "fs";
 import { fileURLToPath, URL } from "url";
 import { transform } from "esbuild";
 
-import type { Config, Extension, Options } from "../config";
+import type { Config, Options } from "../config";
 import { finalize, initialize } from "../utils/index.js";
+import { extname } from "path";
 
 let config: Config;
 
-const EXTN = /\.\w+(?=\?|$)/;
+const isExtension = /\.\w+(?=\?|$)/;
 const isTS = /\.[mc]?tsx?(?=\?|$)/;
 const isJS = /\.([mc])?js$/;
 
@@ -15,13 +16,13 @@ type Promisable<T> = Promise<T> | T;
 type Source = string | SharedArrayBuffer | Uint8Array;
 type Format = "builtin" | "commonjs" | "json" | "module" | "wasm";
 
-type Resolve = (
-  ident: string,
+type ModuleResolver = (
+  specifier: string,
   context: {
     conditions: string[];
     parentURL?: string;
   },
-  fallback: Resolve
+  fallback: ModuleResolver
 ) => Promisable<{
   url: string;
   format?: Format;
@@ -50,86 +51,113 @@ type Load = (
 
 async function toConfig(): Promise<Config> {
   const env = initialize();
-  const setup = env.file && import("file:///" + env.file);
-
-  let mod = await setup;
-  mod = mod && mod.default || mod;
-  return finalize(env, mod);
+  if (env.file) {
+    const loadedModule = await import("file:///" + env.file);
+    return finalize(env, loadedModule.default || loadedModule);
+  }
+  
+  return finalize(env);
 }
 
 async function toOptions(uri: string): Promise<Options|void> {
   config = config || await toConfig();
-  const [extn] = EXTN.exec(uri) || [];
-  return config[extn as `.${string}`];
+  const [extension] = isExtension.exec(uri) || [];
+  return config[extension as `.${string}`];
 }
 
-function check(fileurl: string): string | void {
-  const tmp = fileURLToPath(fileurl);
-  if (existsSync(tmp)) return fileurl;
+function checkFileExists(fileUrl: string): string | void {
+  const tmp = fileURLToPath(fileUrl);
+  if (existsSync(tmp)) {
+    return fileUrl;
+  }
 }
 
-export const resolve: Resolve = async function (ident, context, fallback) {
-  const root = new URL("file:///" + process.cwd() + "/");
-
-  // ignore "prefix:" and non-relative identifiers
-  if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
-
-  let match: RegExpExecArray | null;
-  let idx: number, ext: Extension, path: string | void;
-  const output = new URL(ident, context.parentURL || root);
-
-  // source ident includes extension
-  if (match = EXTN.exec(output.href)) {
-    ext = match[0] as Extension;
-    if (!context.parentURL || isTS.test(ext)) {
-      return { url: output.href };
+export const checkExtensions = async (specifier: string) => {
+  config = config || await toConfig();
+  /**
+     * Check for valid file extensions first.
+     */
+  const possibleExtensions = Object.keys(config).concat([".js"]);
+  for (const possibleExtension of possibleExtensions) {
+    const url = checkFileExists(specifier + possibleExtension);
+    if (url) {
+      return url;
     }
-    // source ident exists
-    path = check(output.href);
-    if (path) return { url: path };
-    // parent importer is a ts file
-    // source ident is js & NOT exists
-    if (isJS.test(ext) && isTS.test(context.parentURL)) {
+  }
+};
+
+export const resolve: ModuleResolver = async function (specifier, context, fallback) {
+  // ignore "prefix:" and non-relative identifiers
+  if (/^\w+\:?/.test(specifier)) {
+    return fallback(specifier, context, fallback);
+  }
+
+  const root = new URL("file:///" + process.cwd());
+  const output = new URL(specifier, context.parentURL || root);
+  const specifierUrl = output.href;
+  const extension = extname(specifierUrl);
+
+  if (!extension) {
+    config = config || await toConfig();
+    /**
+     * Check for valid file extensions first.
+     */
+    const url = await checkExtensions(specifierUrl);
+    if (url) {
+      return { url };
+    }
+    /**
+     * Then, index resolution.
+     */
+    const indexUrl = await checkExtensions(specifierUrl + "/index");
+    if (indexUrl) {
+      return { url: indexUrl };
+    }
+  } else  {
+    if (!context.parentURL || isTS.test(extension)) {
+      return { url: specifierUrl };
+    }
+    
+    const url = checkFileExists(specifierUrl);
+    if (url) {
+      return { url };
+    }
+    
+    if (isJS.test(extension) && isTS.test(context.parentURL)) {
       // reconstruct ".js" -> ".ts" source file
-      path = output.href.substring(0, idx = match.index);
-      if (path = check(path + ext.replace("js", "ts"))) {
-        idx += ext.length;
-        if (idx > output.href.length) {
-          path += output.href.substring(idx);
-        }
-        return { url: path };
+      const baseUrl = specifierUrl.substring(0, specifierUrl.lastIndexOf(extension));
+      const url = checkFileExists(baseUrl + extension.replace("js", "ts"));
+      if (url) {
+        return { url };
       }
       // return original, let it error
-      return fallback(ident, context, fallback);
+      return fallback(specifier, context, fallback);
     }
   }
 
-  config = config || await toConfig();
-
-  for (ext in config) {
-    path = check(output.href + ext);
-    if (path) return { url: path };
-  }
-
-  return fallback(ident, context, fallback);
+  return fallback(specifier, context, fallback);
 };
 
 export const load: Load = async function (uri, context, fallback) {
   // note: inline `getFormat`
   const options = await toOptions(uri);
-  if (options == null) return fallback(uri, context, fallback);
-  const format: Format = options.format === "cjs" ? "commonjs" : "module";
+  if (options == null) {
+    return fallback(uri, context, fallback);
+  }
 
   // TODO: decode SAB/U8 correctly
+  const format: Format = options.format === "cjs" ? "commonjs" : "module";
   const path = fileURLToPath(uri);
   const source = await fs.readFile(path);
 
   // note: inline `transformSource`
-  const result = await transform(source.toString(), {
-    ...options,
-    sourcefile: path,
-    format: format === "module" ? "esm" : "cjs",
-  });
+  const result = await transform(
+    source.toString(), {
+      ...options,
+      sourcefile: path,
+      format: format === "module" ? "esm" : "cjs",
+    }
+  );
 
   return { format, source: result.code };
 };
@@ -147,11 +175,13 @@ export const transformSource: Transform = async function (source, context, xform
   if (options == null) return xform(source, context, xform);
 
   // TODO: decode SAB/U8 correctly
-  const result = await transform(source.toString(), {
-    ...options,
-    sourcefile: context.url,
-    format: context.format === "module" ? "esm" : "cjs",
-  });
+  const result = await transform(
+    source.toString(), {
+      ...options,
+      sourcefile: context.url,
+      format: context.format === "module" ? "esm" : "cjs",
+    }
+  );
 
   return { source: result.code };
 };

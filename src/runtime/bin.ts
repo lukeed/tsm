@@ -9,7 +9,6 @@ import { spawn } from "child_process";
 process.env.NODE_OPTIONS = "--no-warnings";
 
 const __filename = import.meta.url;
-console.log({ __filename });
 const loaderUrl = new URL("../runtime/loader.js", __filename);
 
 const nodeArgs = [

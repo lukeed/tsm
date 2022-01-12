@@ -34,10 +34,11 @@
     "node": ">=16"
   },
   "scripts": {
-    "bootstrap": "esbuild src/commands/build.ts --target=es2021 --outfile=dist/bootstrap.js && TSM_BOOTSTRAP=1 node dist/bootstrap.js",
+    "bootstrap": "esbuild src/commands/build/index.ts --target=es2021 --outfile=dist/bootstrap.js && TSM_BOOTSTRAP=1 node dist/bootstrap.js",
     "prebuild": "yarn bootstrap",
     "build": "./src/index.ts build",
-    "types": "tsc"
+    "types": "tsc",
+    "prepare": "yarn build && yarn types"
   },
   "dependencies": {
     "chalk": "^5.0.0",

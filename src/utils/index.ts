@@ -11,7 +11,6 @@ export function initialize(): Defaults {
   const { FORCE_COLOR, NO_COLOR, NODE_DISABLE_COLORS, TERM } = process.env;
 
   const argv = process.argv.slice(2);
-
   const flags = new Set(argv);
   const isQuiet = flags.has("-q") || flags.has("--quiet");
 
@@ -29,7 +28,7 @@ export function initialize(): Defaults {
       format: "esm",
       charset: "utf8",
       sourcemap: "inline",
-      target: "node" + process.versions.node,
+      target: "node16",
       logLevel: isQuiet ? "silent" : "warning",
       color: enabled,
     }
@@ -49,7 +48,7 @@ export const finalize = function (env: Defaults, custom?: ConfigFile): Config {
     ".tsx": { ...base, loader: "tsx" },
     ".cts": { ...base, loader: "ts" },
     ".ts": { ...base, loader: "ts" },
-    ".json": { ...base, loader: "json" }
+    ".json": { ...base, loader: "json" },
   };
 
   let extn: Extension;

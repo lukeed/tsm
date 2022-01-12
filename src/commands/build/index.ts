@@ -1,8 +1,8 @@
 #!/usr/bin/env tsm
 
 import { build as esbuild, BuildOptions } from "esbuild";
+import { readFile, rm } from "fs/promises";
 import glob from "fast-glob";
-import { readFile } from "fs/promises";
 import { resolve } from "path";
 
 export const build = async (production = false) => {
@@ -18,17 +18,20 @@ export const build = async (production = false) => {
     const shared: BuildOptions = {
       logLevel: production ? "info" : "debug",
       charset: "utf8",
-      minify: production,
       target: "es2021",
-      minifySyntax: true,
+      minify: false,
       define: {
         PACKAGE_JSON: pkgJson,
       }
     };
 
+    const distDir = resolve(cwd, "dist");
+    await rm(distDir, { force: true, recursive: true });
+
+    const tsFiles = await glob("src/**/*.{ts,tsx}", { cwd });
     await esbuild({
       ...shared,
-      entryPoints: await glob("src/**/*.{ts,tsx}", { cwd }),
+      entryPoints: tsFiles.filter((file) => !file.endsWith(".d.ts")),
       outdir: "dist",
       assetNames: "[name].js",
     });

@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from "url";
+import { URL } from "url";
 import { spawn } from "child_process";
 
 export const load = () => {
@@ -8,12 +8,15 @@ export const load = () => {
   process.env.NODE_OPTIONS = "--no-warnings";
 
   const __filename = import.meta.url;
-  console.log({ __filename });
-  const loaderUrl = new URL("../runtime/loader.js", __filename);
+  /**
+   * This will refer to the built loader regardless of whether it is running
+   * from inside `dist/` or `src/`.
+   */
+  const loaderUrl = new URL("../../dist/runtime/loader.js", __filename);
 
   const nodeArgs = [
     "--loader",
-    fileURLToPath(loaderUrl.href),
+    loaderUrl.href,
     ...process.argv.slice(2)
   ];
 
