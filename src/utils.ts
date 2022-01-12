@@ -2,7 +2,7 @@ const { resolve } = require('path');
 const { existsSync } = require('fs');
 
 import type { Format } from 'esbuild';
-import type * as tsm from 'tsm/config';
+import type * as tsm from './config';
 import type { Defaults } from './utils.d';
 
 exports.$defaults = function (format: Format): Defaults {

@@ -4,9 +4,11 @@
  */
 
 const { build } = require('esbuild');
-const pkg = require('../package.json');
+const { readFileSync } = require('fs');
 
 (async function () {
+  const pkgJson = readFileSync('./package.json', 'utf8');
+  const pkg = JSON.parse(pkgJson);
 	/**
 	 * @type {import('esbuild').BuildOptions}
 	 */

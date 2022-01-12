@@ -26,10 +26,12 @@
     "config"
   ],
   "engines": {
-    "node": ">=12"
+    "node": ">=16"
   },
   "scripts": {
-    "build": "./build/index.ts",
+    "bootstrap": "node src/build/bootstrap.js",
+    "prebuild": "yarn bootstrap",
+    "build": "./src/build/index.ts",
     "types": "tsc"
   },
   "dependencies": {

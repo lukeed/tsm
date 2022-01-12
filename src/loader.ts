@@ -2,7 +2,7 @@ import { existsSync, promises as fs } from 'fs';
 import { fileURLToPath, URL } from 'url';
 import * as tsm from './utils.js';
 
-import type { Config, Extension, Options } from 'tsm/config';
+import type { Config, Extension, Options } from './config';
 type TSM = typeof import('./utils.d');
 
 let config: Config;

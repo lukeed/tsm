@@ -2,7 +2,7 @@ const { extname } = require('path');
 const { readFileSync } = require('fs');
 const tsm = require('./utils');
 
-import type { Config, Options } from 'tsm/config';
+import type { Config, Options } from './config';
 type TSM = typeof import('./utils.d');
 
 type Module = NodeJS.Module & {

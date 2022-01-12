@@ -1,7 +1,11 @@
 #!/usr/bin/env node
-let argv = process.argv.slice(2);
 
-// note: injected @ build
+/**
+ * Silence experimental warnings.
+ */
+process.env.NODE_OPTIONS = "--no-warnings";
+
+let argv = process.argv.slice(2);
 declare const VERSION: string;
 
 if (argv.includes('-h') || argv.includes('--help')) {

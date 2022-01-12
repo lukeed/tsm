@@ -6,7 +6,7 @@
     "target": "es2019",
     "moduleResolution": "node",
     "strictBindCallApply": true,
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "strictFunctionTypes": true,
     "resolveJsonModule": true,
@@ -16,10 +16,14 @@
     "alwaysStrict": true,
     "module": "esnext",
     "checkJs": true,
-    "noEmit": true,
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": true,
     "jsx": "react",
+    "baseUrl": ".",
     "paths": {
-      "tsm/config": ["./config/index.d.ts"]
+      "tsm/config": ["src/config/index.d.ts"]
     }
   },
   "include": [
