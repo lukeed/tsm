@@ -1,14 +1,14 @@
 import { existsSync, promises as fs } from 'fs';
 import { fileURLToPath, URL } from 'url';
-import * as tsm from './utils.js';
+import * as tsm from './utils/index.js';
 
 import type { Config, Extension, Options } from './config';
-type TSM = typeof import('./utils.d');
+type TSM = typeof import('./utils/index.d');
 
 let config: Config;
 let esbuild: typeof import('esbuild');
 
-let env = (tsm as TSM).$defaults('esm');
+let env = (tsm as unknown as TSM).$defaults('esm');
 let setup = env.file && import('file:///' + env.file);
 
 type Promisable<T> = Promise<T> | T;
@@ -51,7 +51,7 @@ type Load = (
 async function toConfig(): Promise<Config> {
 	let mod = await setup;
 	mod = mod && mod.default || mod;
-	return (tsm as TSM).$finalize(env, mod);
+	return (tsm as unknown as TSM).$finalize(env, mod);
 }
 
 const EXTN = /\.\w+(?=\?|$)/;

@@ -2,8 +2,8 @@ const { resolve } = require('path');
 const { existsSync } = require('fs');
 
 import type { Format } from 'esbuild';
-import type * as tsm from './config';
-import type { Defaults } from './utils.d';
+import type * as tsm from '../config';
+import type { Defaults } from './index.d';
 
 exports.$defaults = function (format: Format): Defaults {
 	let { FORCE_COLOR, NO_COLOR, NODE_DISABLE_COLORS, TERM } = process.env;

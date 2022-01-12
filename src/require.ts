@@ -1,9 +1,9 @@
 const { extname } = require('path');
 const { readFileSync } = require('fs');
-const tsm = require('./utils');
+const tsm = require('./utils/index');
 
 import type { Config, Options } from './config';
-type TSM = typeof import('./utils.d');
+type TSM = typeof import('./utils/index.d');
 
 type Module = NodeJS.Module & {
 	_compile?(source: string, filename: string): typeof loader;

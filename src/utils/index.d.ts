@@ -1,5 +1,5 @@
 import type { Format } from 'esbuild';
-import type { Config, Options } from './config';
+import type { Config, Options } from '../config';
 
 export interface Defaults {
 	file: string | false;

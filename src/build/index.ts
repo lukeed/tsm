@@ -17,8 +17,8 @@ try {
 
 	await build({
 		...shared,
-		entryPoints: ['src/utils.ts'],
-		outfile: './dist/utils.js',
+		entryPoints: ['src/utils/index.ts'],
+		outfile: './dist/utils/index.js',
 	});
 
 	await build({
