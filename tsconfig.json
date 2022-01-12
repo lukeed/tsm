@@ -20,10 +20,10 @@
     "rootDir": "src",
     "outDir": "dist",
     "declaration": true,
-    "jsx": "react",
+    "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "tsm/config": ["src/config/index.d.ts"]
+      "tsm/config": ["src/config"]
     }
   },
   "include": [

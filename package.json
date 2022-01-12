@@ -2,17 +2,24 @@
   "name": "tsm",
   "type": "module",
   "version": "2.2.1",
-  "repository": "lukeed/tsm",
+  "repository": "ctjlewis/tsm",
   "description": "TypeScript Module Loader",
   "license": "MIT",
-  "bin": "dist/bin.js",
-  "author": {
-    "name": "Luke Edwards",
-    "email": "luke.edwards05@gmail.com",
-    "url": "https://lukeed.com"
-  },
+  "bin": "dist/runtime/bin.js",
+  "contributors": [
+    {
+      "name": "C. Lewis",
+      "email": "ctj.lewis@icloud.com",
+      "url": "https://ctjlewis.com"
+    },
+    {
+      "name": "Luke Edwards",
+      "email": "luke.edwards05@gmail.com",
+      "url": "https://lukeed.com"
+    }
+  ],
   "exports": {
-    ".": "./dist/loader.js",
+    ".": "./dist/runtime/loader.js",
     "./config": "./config/index.js",
     "./package.json": "./package.json"
   },
@@ -27,12 +34,14 @@
     "node": ">=16"
   },
   "scripts": {
-    "bootstrap": "esbuild src/build/index.ts --target=es2021 --outfile=dist/bootstrap.js && node dist/bootstrap.js",
+    "bootstrap": "esbuild src/commands/build.ts --target=es2021 --outfile=dist/bootstrap.js && TSM_BOOTSTRAP=1 node dist/bootstrap.js",
     "prebuild": "yarn bootstrap",
-    "build": "./src/build/index.ts",
+    "build": "./src/index.ts build",
     "types": "tsc"
   },
   "dependencies": {
+    "chalk": "^5.0.0",
+    "commander": "^8.3.0",
     "esbuild": "^0.14.0",
     "fast-glob": "^3.2.10"
   },

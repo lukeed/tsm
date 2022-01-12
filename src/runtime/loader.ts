@@ -1,14 +1,15 @@
-import { transform } from "esbuild";
 import { existsSync, promises as fs } from "fs";
 import { fileURLToPath, URL } from "url";
+import { transform } from "esbuild";
 
-import type { Config, Extension, Options } from "./config";
-import { finalize, initialize } from "./utils/index.js";
+import type { Config, Extension, Options } from "../config";
+import { finalize, initialize } from "../utils/index.js";
 
 let config: Config;
 
-const env = initialize();
-const setup = env.file && import("file:///" + env.file);
+const EXTN = /\.\w+(?=\?|$)/;
+const isTS = /\.[mc]?tsx?(?=\?|$)/;
+const isJS = /\.([mc])?js$/;
 
 type Promisable<T> = Promise<T> | T;
 type Source = string | SharedArrayBuffer | Uint8Array;
@@ -48,14 +49,14 @@ type Load = (
 }>;
 
 async function toConfig(): Promise<Config> {
+  const env = initialize();
+  const setup = env.file && import("file:///" + env.file);
+
   let mod = await setup;
   mod = mod && mod.default || mod;
   return finalize(env, mod);
 }
 
-const EXTN = /\.\w+(?=\?|$)/;
-const isTS = /\.[mc]?tsx?(?=\?|$)/;
-const isJS = /\.([mc])?js$/;
 async function toOptions(uri: string): Promise<Options|void> {
   config = config || await toConfig();
   const [extn] = EXTN.exec(uri) || [];
@@ -67,8 +68,9 @@ function check(fileurl: string): string | void {
   if (existsSync(tmp)) return fileurl;
 }
 
-const root = new URL("file:///" + process.cwd() + "/");
 export const resolve: Resolve = async function (ident, context, fallback) {
+  const root = new URL("file:///" + process.cwd() + "/");
+
   // ignore "prefix:" and non-relative identifiers
   if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
 

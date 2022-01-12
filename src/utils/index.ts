@@ -39,7 +39,7 @@ export function initialize(): Defaults {
 export const finalize = function (env: Defaults, custom?: ConfigFile): Config {
   const base = env.options;
   if (custom && custom.common) {
-    Object.assign(base, custom.common!);
+    Object.assign(base, custom.common);
     delete custom.common; // loop below
   }
 
@@ -49,9 +49,8 @@ export const finalize = function (env: Defaults, custom?: ConfigFile): Config {
     ".tsx": { ...base, loader: "tsx" },
     ".cts": { ...base, loader: "ts" },
     ".ts": { ...base, loader: "ts" },
+    ".json": { ...base, loader: "json" }
   };
-
-  config[".json"] = { ...base, loader: "json" };
 
   let extn: Extension;
   if (custom && custom.loaders) {
