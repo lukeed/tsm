@@ -1,6 +1,6 @@
 export type Promisable<T> = Promise<T> | T;
-export type Source = string | SharedArrayBuffer | Uint8Array;
-export type Format = "builtin" | "commonjs" | "json" | "module" | "wasm";
+export type ModuleSource = string | SharedArrayBuffer | Uint8Array;
+export type ModuleFormat = "builtin" | "commonjs" | "json" | "module" | "wasm";
 
 export type ModuleResolver = (
   specifier: string,
@@ -11,26 +11,26 @@ export type ModuleResolver = (
   fallback: ModuleResolver
 ) => Promisable<{
   url: string;
-  format?: Format;
+  format?: ModuleFormat;
 }>;
 
 export type Inspect = (
   url: string,
   context: object,
   fallback: Inspect
-) => Promisable<{ format: Format }>;
+) => Promisable<{ format: ModuleFormat }>;
 
 export type Transform = (
-  source: Source,
+  source: ModuleSource,
   context: Record<"url" | "format", string>,
   fallback: Transform
-) => Promisable<{ source: Source }>;
+) => Promisable<{ source: ModuleSource }>;
 
 export type ModuleLoader = (
   url: string,
-  context: { format?: Format },
+  context: { format?: ModuleFormat },
   fallback: ModuleLoader
 ) => Promisable<{
-  format: Format;
-  source: Source;
+  format: ModuleFormat;
+  source: ModuleSource;
 }>;

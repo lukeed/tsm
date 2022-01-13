@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from "url";
 import { transform } from "esbuild";
 
 import type { Config, Options } from "../config/types";
-import type { Format, Inspect, ModuleLoader, ModuleResolver, Transform } from "./types";
+import type { ModuleFormat, Inspect, ModuleLoader, ModuleResolver, Transform } from "./types";
 import { extname, join } from "path";
 import { finalize, initialize } from "../config/index.js";
 
@@ -40,8 +40,8 @@ const fileExists = (fileUrl: string): string | void => {
 const checkExtensions = async (specifier: string) => {
   const config = await getConfig();
   /**
-     * Check for valid file extensions first.
-     */
+   * Check for valid file extensions first.
+   */
   const possibleExtensions = Object.keys(config).concat([".js"]);
   for (const possibleExtension of possibleExtensions) {
     const url = fileExists(specifier + possibleExtension);
@@ -61,9 +61,10 @@ export const resolve: ModuleResolver = async (specifier, context, defaultResolve
   }
 
   const root = new URL("file:///" + process.cwd());
-  const output = new URL(specifier, context.parentURL || root);
-  const specifierExtension = extname(output.href).replace(/\W\w+$/, "");
-  const specifierUrl = output.href.substring(0, output.href.lastIndexOf(specifierExtension));
+  const { parentURL } = context;
+  const { href } = new URL(specifier, parentURL || root);
+  const parentExtension = extname(parentURL ?? "").toLowerCase();
+  const specifierExtension = extname(href).toLowerCase();
 
   /**
    * Resolve TypeScript's bare import syntax.
@@ -72,23 +73,34 @@ export const resolve: ModuleResolver = async (specifier, context, defaultResolve
     /**
      * Check for valid file extensions first.
      */
-    const url = await checkExtensions(specifierUrl);
+    const url = await checkExtensions(href);
     if (url) {
       return { url };
     }
     /**
      * Then, index resolution.
      */
-    const indexUrl = await checkExtensions(join(specifierUrl, "index"));
+    const indexUrl = await checkExtensions(join(href, "index"));
     if (indexUrl) {
       return { url: indexUrl };
     }
-  }
-  /**
-   * Resolve to the specifier if the file exists or there is no parent URL.
-   */
-  if (fileExists(specifierUrl) || !context.parentURL) {
-    return { url: specifierUrl };
+  } else {
+    const unresolvedSpecifier = href.substring(0, href.lastIndexOf(specifierExtension));
+    /**
+     * JS being imported by a TS file.
+     */
+    if (specifierExtension.startsWith(".js") && parentExtension.startsWith(".ts")) {
+      const originalTsFile = `${unresolvedSpecifier}.ts`;
+      if (fileExists(originalTsFile)) {
+        return { url: originalTsFile };
+      }
+    }
+    /**
+     * Resolve to the specifier if the file exists or there is no parent URL.
+     */
+    if (fileExists(unresolvedSpecifier) || !context.parentURL) {
+      return { url: unresolvedSpecifier };
+    }
   }
 
   return defaultResolve(specifier, context, defaultResolve);
@@ -102,7 +114,7 @@ export const load: ModuleLoader = async (url, context, defaultLoad) => {
   }
 
   // TODO: decode SAB/U8 correctly
-  const format: Format = options.format === "cjs" ? "commonjs" : "module";
+  const format: ModuleFormat = options.format === "cjs" ? "commonjs" : "module";
   const path = fileURLToPath(url);
   const source = await fs.readFile(path);
 
