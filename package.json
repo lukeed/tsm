@@ -1,7 +1,7 @@
 {
   "name": "tsm",
   "type": "module",
-  "version": "2.2.1",
+  "version": "3.0.0",
   "repository": "ctjlewis/tsm",
   "description": "TypeScript Module Loader",
   "license": "MIT",
@@ -35,7 +35,7 @@
     "node": ">=16"
   },
   "scripts": {
-    "bootstrap": "esbuild src/commands/build.ts --target=es2021 --outfile=dist/bootstrap.js && TSM_BOOTSTRAP=1 node dist/bootstrap.js",
+    "bootstrap": "esbuild src/commands/build.ts --target=es2021 --outfile=dist/commands/build.js && TSM_BOOTSTRAP=1 node dist/commands/build.js",
     "prebuild": "yarn bootstrap",
     "build": "./src/index.ts build",
     "types": "tsc",
@@ -45,7 +45,9 @@
     "chalk": "^5.0.0",
     "commander": "^8.3.0",
     "esbuild": "^0.14.0",
-    "fast-glob": "^3.2.10"
+    "fast-glob": "^3.2.10",
+    "rollup": "^2.63.0",
+    "rollup-plugin-preserve-shebang": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "17.0.8",

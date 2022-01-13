@@ -1,7 +1,7 @@
 #!/usr/bin/env tsm
 
+import { build, postBuild } from "./commands/build";
 import { Command } from "commander";
-import { build } from "./commands/build";
 import { execute } from "./commands/execute";
 
 if (process.argv.length >= 2) {
@@ -12,6 +12,11 @@ if (process.argv.length >= 2) {
     .option("-d, --dev", "Build development version (default: production)")
     .description("Builds TS in src/ to output in dist/.")
     .action(async ({ dev }) => await build(!dev));
+
+  program 
+    .command("postBuild")
+    .description("Optimizes the built files.")
+    .action(async () => await postBuild());
 
   program
     .command("execute <file>", { isDefault: true })
