@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 3
     strategy:
       matrix:
-        nodejs: [12, 14, 16.11, 16]
+        nodejs: [16]
         os: [ubuntu-latest, windows-latest]
     steps:
     - uses: actions/checkout@v2
@@ -33,19 +33,13 @@ jobs:
       run: npm run types
 
     - name: Tests <~ ESM
-      run: node --loader ./loader.js test/index.mjs
+      run: node --loader ./dist/loader/index.js test/index.mjs
 
     - name: Tests <~ ESM <~ TypeScript
-      run: node --loader ./loader.js test/config/index.ts --tsmconfig test/config/tsm.js
-
-    - name: Tests <~ CommonJS
-      run: node -r ./require.js test/index.js
-
-    - name: Tests <~ CommonJS <~ TypeScript
-      run: node -r ./require.js test/config/index.ts --tsmconfig test/config/tsm.js
+      run: node --loader ./dist/loader/index.js test/config/index.ts --tsmconfig test/config/tsm.js
 
     - name: Tests <~ CLI
-      run: node bin.js test/index.mjs
+      run: ./dist/index.js test/index.mjs
 
     - name: Tests <~ CLI <~ TypeScript
-      run: node bin.js test/config/index.ts --tsmconfig test/config/tsm.js
+      run: ./dist/index.js test/config/index.ts --tsmconfig test/config/tsm.js
