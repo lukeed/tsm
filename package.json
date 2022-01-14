@@ -38,7 +38,7 @@
     "node": ">=16"
   },
   "scripts": {
-    "bootstrap": "node bootstrap.js && TSM_BOOTSTRAP=1 node dist/commands/build.js",
+    "bootstrap": "node bootstrap.js && node dist/runtime/bootstrap.js",
     "prebuild": "yarn bootstrap",
     "build": "node --loader ./dist/loader/index.js src/index.ts build",
     "types": "tsc",

@@ -220,7 +220,3 @@ export const postBuild = async () => {
     )
   );
 };
-
-if (process.env.TSM_BOOTSTRAP) {
-  build();
-}

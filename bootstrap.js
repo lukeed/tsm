@@ -5,6 +5,7 @@ const BOOTSTRAP_FILES = [
   "src/loader/index.ts",
   "src/config/index.ts",
   "src/utils/log.ts",
+  "src/runtime/bootstrap.ts",
 ];
 
 await esbuild({
@@ -13,3 +14,5 @@ await esbuild({
   outdir: "dist",
   assetNames: "[name].js",
 });
+
+await import("./dist/runtime/bootstrap.js");
