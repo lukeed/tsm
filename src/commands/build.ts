@@ -170,7 +170,7 @@ export const build = async (production = false) => {
       logLevel: production ? "info" : "debug",
       charset: "utf8",
       target: "es2021",
-      minify: false,
+      minify: production,
       define: {
         PACKAGE_JSON: pkgJson,
       }
@@ -186,6 +186,8 @@ export const build = async (production = false) => {
       outdir: "dist",
       assetNames: "[name].js",
     });
+
+    await postBuild();
   } catch (err) {
     console.error(err);
     process.exitCode = 1;
