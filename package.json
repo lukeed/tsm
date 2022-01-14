@@ -40,7 +40,7 @@
   "scripts": {
     "bootstrap": "node bootstrap.js && TSM_BOOTSTRAP=1 node dist/commands/build.js",
     "prebuild": "yarn bootstrap",
-    "build": "./src/index.ts build",
+    "build": "node --loader ./dist/loader/index.js src/index.ts build",
     "types": "tsc",
     "prepare": "yarn build && yarn types"
   },
