@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - 'master'
+      - '**'
   pull_request:
     branches:
       - '**'
@@ -23,14 +23,11 @@ jobs:
       with:
         node-version: ${{ matrix.nodejs }}
 
-    - name: Install
-      run: npm install
-
-    - name: Compiles
-      run: npm run build
+    - name: Install and link
+      run: yarn install --frozen-lockfile && yarn link
 
     - name: Type Checks
-      run: npm run types
+      run: yarn types
 
     - name: Tests <~ ESM
       run: node --loader ./dist/loader/index.js test/index.mjs

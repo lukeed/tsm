@@ -5,7 +5,10 @@
   "repository": "ctjlewis/tsm",
   "description": "TypeScript Module Loader",
   "license": "MIT",
-  "bin": "dist/runtime/bin.js",
+  "bin": {
+    "tsm": "./dist/runtime/bin.js",
+    "tsm-cli": "dist/index.js"
+  },
   "types": "dist/types/index.d.ts",
   "contributors": [
     {

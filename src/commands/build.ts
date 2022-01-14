@@ -15,6 +15,7 @@ import shebang from "rollup-plugin-preserve-shebang";
  * Until then, there's no way around manually specifying full specifiers in
  * internal source (for bootstrap code path).
  */
+import { debugLog } from "../utils/log.js";
 import { resolve } from "../loader/index.js";
 
 const forceUnixPath = (path: string) => {
@@ -53,7 +54,7 @@ export const rewriteImport = (
   importToReplace: string,
   importReplacement: string,
 ) => {
-  console.log({ importStatement, importToReplace, importReplacement });
+  debugLog({ importStatement, importToReplace, importReplacement });
   const [, sourcePart] = importStatement.split(/from|\(/);
   const rewrittenSource = sourcePart
     .replace(importToReplace, importReplacement)
@@ -67,7 +68,7 @@ export const rewriteImports: () => RollupPlugin = () => {
     name: "Rewrite imports",
     renderChunk: async (code: string, chunk, options) => {
       for (const importedChunk of chunk.imports) {
-        // console.log({ importedChunk });
+        // debugLog({ importedChunk });
         /**
          * If no absolute module ID, bail.
          */
@@ -78,7 +79,7 @@ export const rewriteImports: () => RollupPlugin = () => {
          * Just a named module. Skip.
          */
         if (!importedChunk.includes("/")) {
-          console.log(`- Skipping named module: ${importedChunk}`);
+          debugLog(`- Skipping named module: ${importedChunk}`);
           continue;
         }
 
@@ -88,7 +89,7 @@ export const rewriteImports: () => RollupPlugin = () => {
            * never rewritten.
            */
           if (isAbsolute(importedChunk)) {
-            console.log(`Ignoring absolute specifier: ${importedChunk}`);
+            debugLog(`Ignoring absolute specifier: ${importedChunk}`);
             continue;
           }
           /**
@@ -105,7 +106,7 @@ export const rewriteImports: () => RollupPlugin = () => {
          * replacement.
          */
         if (isAbsolute(importedChunk)) {
-          console.log(`Rewriting partial specifier: ${importedChunk}`);
+          debugLog(`Rewriting partial specifier: ${importedChunk}`);
           importToReplace = getRelativePath(baseDir, importedChunk);
         }
 
@@ -114,9 +115,9 @@ export const rewriteImports: () => RollupPlugin = () => {
          */
         const importMatch = importPattern(importToReplace);
         const importStatements = code.match(importMatch) ?? [];
-        // console.log({ importStatements });
+        // debugLog({ importStatements });
 
-        // console.log({ file: options.file, imports: chunk.imports, importStatements });
+        // debugLog({ file: options.file, imports: chunk.imports, importStatements });
         for (const importStatement of importStatements) {
           if (options.file) {
             const parentURL = pathToFileURL(resolvePath(input)).href;
@@ -140,11 +141,11 @@ export const rewriteImports: () => RollupPlugin = () => {
                 getRelativePath(baseDir, unixLikePath),
               );
 
-              console.log({ input, importStatement, rewrittenImport });
+              debugLog({ input, importStatement, rewrittenImport });
               code = code.replace(importStatement, rewrittenImport);
             }
-            // console.log(parentURL);
-            // console.log(rewrittenImport);
+            // debugLog(parentURL);
+            // debugLog(rewrittenImport);
           }
         }
       }
@@ -155,7 +156,7 @@ export const rewriteImports: () => RollupPlugin = () => {
         sourcemap: false,
       };
       // for (const chunkImport of chunk.imports) {
-      //   console.log({ chunkImport });
+      //   debugLog({ chunkImport });
       // }
     },
   };
@@ -164,7 +165,7 @@ export const rewriteImports: () => RollupPlugin = () => {
 export const build = async (production = false) => {
   try {
     if (production) {
-      console.log(chalk.grey("Building for production..."));
+      debugLog(chalk.grey("Building for production..."));
     }
 
     const cwd = process.cwd();
@@ -203,7 +204,7 @@ export const postBuild = async () => {
   await Promise.all(
     filesToOptimize.map(
       async (file) => {
-        console.log("Optimizing", file);
+        debugLog("Optimizing", file);
         const build = await rollup({
           input: file,
           external: (id: string) => id !== file,
