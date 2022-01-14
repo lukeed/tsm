@@ -130,7 +130,6 @@ export const resolve: ModuleResolver = async (specifier, context, defaultResolve
      * JS being imported by a TS file.
      */
     if (isJS.test(specifierExtension) && isTS.test(parentExtension)) {
-      console.log(specifier);
       const tsMatch = await checkTsExtensions(unresolvedSpecifier);
       if (tsMatch) {
         return { url: tsMatch };

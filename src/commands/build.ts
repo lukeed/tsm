@@ -209,7 +209,7 @@ export const postBuild = async () => {
           input: file,
           external: (id: string) => id !== file,
           plugins: [rewriteImports(), shebang()],
-          // onwarn: () => void 0,
+          onwarn: () => void 0,
         });
 
         await build.write({
