@@ -9,8 +9,6 @@ import * as mjs from "../fixtures/utils.mjs";
 import * as data from "../fixtures/data.json";
 assert.equal(typeof data, "object");
 
-assert.equal(typeof data, "string");
-
 // NOTE: raw JS missing
 assert.equal(typeof js, "object", "JS :: typeof");
 assert.equal(typeof js.sum, "function", "JS :: typeof :: sum");

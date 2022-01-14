@@ -59,7 +59,6 @@ export const finalize = function (env: Defaults, custom?: ConfigFile): Config {
       config[extn] = {
         ...base,
         ...conf[extn]
-
       };
     }
   }

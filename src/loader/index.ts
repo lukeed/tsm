@@ -14,6 +14,8 @@ import { extname, join } from "path";
 import { finalize, initialize } from "../config/index.js";
 
 let config: Config;
+const isTS = /\.[mc]?tsx?(?=\?|$)/;
+const isJS = /\.([mc])?js$/;
 
 const getConfig = async (): Promise<Config> => {
   if (config) {
@@ -43,18 +45,50 @@ const fileExists = (fileUrl: string): string | void => {
   }
 };
 
-const checkExtensions = async (specifier: string) => {
-  const config = await getConfig();
-  /**
-   * Check for valid file extensions first.
-   */
-  const possibleExtensions = Object.keys(config).concat([".js"]);
-  for (const possibleExtension of possibleExtensions) {
-    const url = fileExists(specifier + possibleExtension);
-    if (url) {
-      return url;
+const fileExistsAny = (fileUrls: string[]): string | void => {
+  for (const fileUrl of fileUrls) {
+    if (fileExists(fileUrl)) {
+      return fileUrl;
     }
   }
+};
+
+const checkTsExtensions = async (specifier: string) => {
+  const config = await getConfig();
+  const possibleExtensions = 
+    Object
+      .keys(config)
+      .filter((extension) => extension.includes("ts"))
+      .concat([".js"]);
+
+  return fileExistsAny(
+    possibleExtensions.map(
+      (extension) => specifier + extension,
+    )
+  );
+};
+
+const checkJsExtension = async (specifier: string) => {
+  const config = await getConfig();
+  const possibleExtensions = 
+    Object
+      .keys(config)
+      .filter((extension) => extension.includes("js"))
+      .concat([".js"]);
+
+  return fileExistsAny(
+    possibleExtensions.map(
+      (extension) => specifier + extension,
+    )
+  );
+};
+
+const checkExtensions = async (specifier: string) => {
+  const jsMatch = await checkJsExtension(specifier);
+  if (jsMatch) return jsMatch;
+
+  const tsMatch = await checkTsExtensions(specifier);
+  if (tsMatch) return tsMatch;
 };
 
 export const resolve: ModuleResolver = async (specifier, context, defaultResolve) => {
@@ -95,10 +129,11 @@ export const resolve: ModuleResolver = async (specifier, context, defaultResolve
     /**
      * JS being imported by a TS file.
      */
-    if (specifierExtension.startsWith(".js") && parentExtension.startsWith(".ts")) {
-      const originalTsFile = `${unresolvedSpecifier}.ts`;
-      if (fileExists(originalTsFile)) {
-        return { url: originalTsFile };
+    if (isJS.test(specifierExtension) && isTS.test(parentExtension)) {
+      console.log(specifier);
+      const tsMatch = await checkTsExtensions(unresolvedSpecifier);
+      if (tsMatch) {
+        return { url: tsMatch };
       }
     }
     /**
