@@ -3,7 +3,8 @@ import { build as esbuild } from "esbuild";
 const BOOTSTRAP_FILES = [
   "src/commands/build.ts",
   "src/loader/index.ts",
-  "src/config/index.ts"
+  "src/config/index.ts",
+  "src/utils/log.ts",
 ];
 
 await esbuild({
