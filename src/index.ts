@@ -1,7 +1,7 @@
 #!/usr/bin/env tsm
 
-import { build, postBuild } from "./commands/build";
 import { Command } from "commander";
+import { build } from "./commands/build";
 import { execute } from "./commands/execute";
 
 if (process.argv.length >= 2) {

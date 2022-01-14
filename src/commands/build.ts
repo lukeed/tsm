@@ -17,12 +17,9 @@ import shebang from "rollup-plugin-preserve-shebang";
  */
 import { resolve } from "../loader/index.js";
 
-/**
- * This import breaks everything.
- */
-// import { resolve } from "../loader/index.js";
-
-const forceUnixPath = (path: string) => path.replace("file://", "");
+const forceUnixPath = (path: string) => {
+  return path.replace("file://", "");
+};
 
 const getRelativePath = (baseUrl: string, path: string) => {
   const relativePath = relative(baseUrl, forceUnixPath(path));
@@ -57,7 +54,7 @@ export const rewriteImport = (
   importReplacement: string,
 ) => {
   console.log({ importStatement, importToReplace, importReplacement });
-  const [_, sourcePart] = importStatement.split(/from|\(/);
+  const [, sourcePart] = importStatement.split(/from|\(/);
   const rewrittenSource = sourcePart
     .replace(importToReplace, importReplacement)
     .trim();
