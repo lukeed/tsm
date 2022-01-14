@@ -5,6 +5,12 @@ import { transform } from "esbuild";
 import type { Config, Options } from "../config/types";
 import type { ModuleFormat, Inspect, ModuleLoader, ModuleResolver, Transform } from "./types";
 import { extname, join } from "path";
+
+/**
+ * TODO: Version the loader independently so it can be used for bootstrapping.
+ * Until then, there's no way around manually specifying full specifiers in
+ * internal source (for bootstrap code path).
+ */
 import { finalize, initialize } from "../config/index.js";
 
 let config: Config;

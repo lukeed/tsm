@@ -1,15 +1,20 @@
+import { dirname, extname, isAbsolute, relative, resolve as resolvePath } from "path";
 import { build as esbuild, BuildOptions } from "esbuild";
 import { readFile, rm } from "fs/promises";
 import chalk from "chalk";
 import glob from "fast-glob";
-import { dirname, extname, isAbsolute, relative, resolve as resolvePath } from "path";
+import { pathToFileURL } from "url";
 
 import { Plugin as RollupPlugin, rollup } from "rollup";
-import { RenderedChunk } from "rollup";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore No types available for this plugin.
 import shebang from "rollup-plugin-preserve-shebang";
-import { fileURLToPath, pathToFileURL } from "url";
+
+/**
+ * TODO: Version the loader independently so it can be used for bootstrapping.
+ * Until then, there's no way around manually specifying full specifiers in
+ * internal source (for bootstrap code path).
+ */
 import { resolve } from "../loader/index.js";
 
 /**
@@ -17,8 +22,10 @@ import { resolve } from "../loader/index.js";
  */
 // import { resolve } from "../loader/index.js";
 
+const forceUnixPath = (path: string) => path.replace("file://", "");
+
 const getRelativePath = (baseUrl: string, path: string) => {
-  const relativePath = relative(baseUrl, path);
+  const relativePath = relative(baseUrl, forceUnixPath(path));
   return (
     relativePath.startsWith(".")
       ? relativePath
@@ -74,7 +81,7 @@ export const rewriteImports: () => RollupPlugin = () => {
          * Just a named module. Skip.
          */
         if (!importedChunk.includes("/")) {
-          console.log(`Skipping named module: ${importedChunk}`);
+          console.log(`- Skipping named module: ${importedChunk}`);
           continue;
         }
 

@@ -35,7 +35,7 @@
     "node": ">=16"
   },
   "scripts": {
-    "bootstrap": "esbuild src/commands/build.ts --target=es2021 --outfile=dist/commands/build.js && TSM_BOOTSTRAP=1 node dist/commands/build.js",
+    "bootstrap": "node bootstrap.js && TSM_BOOTSTRAP=1 node dist/commands/build.js",
     "prebuild": "yarn bootstrap",
     "build": "./src/index.ts build",
     "types": "tsc",
