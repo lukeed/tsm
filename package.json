@@ -28,11 +28,7 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "bin.js",
-    "utils.js",
-    "require.js",
-    "loader.js",
-    "config"
+    "dist/"
   ],
   "engines": {
     "node": ">=16"
