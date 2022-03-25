@@ -91,7 +91,7 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 		if (isJS.test(ext) && isTS.test(context.parentURL)) {
 			// reconstruct ".js" -> ".ts" source file
 			path = output.href.substring(0, idx = match.index);
-			if (path = check(path + ext.replace("js", "ts")) || check(path + ext.replace("js", "tsx"))) {
+			if (path = check(path + ext.replace('js', 'ts')) || check(path + ext.replace('js', 'tsx'))) {
 				idx += ext.length;
 				if (idx > output.href.length) {
 					path += output.href.substring(idx);
