@@ -2,6 +2,10 @@
 import assert from 'assert';
 
 import jsx from './fixtures/App1';
+import tsx from './fixtures/App2';
+
+console.log({ tsx, jsx });
+
 import json from './fixtures/data.json';
 // @ts-ignore – expects definitions
 import * as mts from './fixtures/utils.mts';
@@ -9,8 +13,7 @@ import * as mts from './fixtures/utils.mts';
 import * as cts from './fixtures/utils.cts';
 // @ts-ignore – prefers extensionless
 import * as ts from './fixtures/math.ts';
-// @ts-ignore – prefers extensionless
-import tsx from './fixtures/App2.tsx';
+
 // @ts-ignore – prefers extensionless
 import * as esm1 from './fixtures/module/index.js';
 // @ts-ignore – prefers extensionless

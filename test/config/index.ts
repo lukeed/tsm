@@ -9,6 +9,10 @@ import * as cjs from '../fixtures/utils.cjs';
 // @ts-ignore - cannot find types
 import * as esm from '../fixtures/module/index.js';
 
+import jsx from '../fixtures/App1';
+import tsx from '../fixtures/App2';
+console.log({ jsx, tsx });
+
 // NOTE: avoid need for syntheticDefault + analysis
 import * as data from '../fixtures/data.json';
 assert.equal(typeof data, 'object');

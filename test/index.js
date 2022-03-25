@@ -1,10 +1,12 @@
 // @ts-check
 const assert = require('assert');
 
-const jsx = require('./fixtures/App1.jsx');
+const jsx = require('./fixtures/App1');
+const tsx = require('./fixtures/App2');
+
+console.log({ tsx, jsx });
+
 const json = require('./fixtures/data.json');
-// @ts-ignore – prefers extensionless
-const tsx = require('./fixtures/App2.tsx');
 // @ts-ignore – prefers extensionless
 const ts = require('./fixtures/math.ts');
 // @ts-ignore – prefers extensionless
