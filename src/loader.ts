@@ -69,7 +69,15 @@ function check(fileurl: string): string | void {
 }
 
 const root = new URL('file:///' + process.cwd() + '/');
-export const resolve: Resolve = async function (ident, context, fallback) {
+
+// NOTE NodeJS 18.6.0+ requires shortCircuit: true to be added.
+const withShortCircuit = <F extends (...args: any[]) => any>(fn: F): F => {
+	return (async (...args) => {
+		return Object.assign(await fn(...args), { shortCircuit: true });
+	}) as F;
+}
+
+export const resolve: Resolve = withShortCircuit(async function (ident, context, fallback) {
 	// ignore "prefix:" and non-relative identifiers
 	if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
 
@@ -111,9 +119,9 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 	}
 
 	return fallback(ident, context, fallback);
-}
+})
 
-export const load: Load = async function (uri, context, fallback) {
+export const load: Load = withShortCircuit(async function (uri, context, fallback) {
 	// note: inline `getFormat`
 	let options = await toOptions(uri);
 	if (options == null) return fallback(uri, context, fallback);
@@ -132,7 +140,7 @@ export const load: Load = async function (uri, context, fallback) {
 	});
 
 	return { format, source: result.code };
-}
+})
 
 /** @deprecated */
 export const getFormat: Inspect = async function (uri, context, fallback) {
