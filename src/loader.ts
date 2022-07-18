@@ -70,14 +70,7 @@ function check(fileurl: string): string | void {
 
 const root = new URL('file:///' + process.cwd() + '/');
 
-// NOTE NodeJS 18.6.0+ requires shortCircuit: true to be added.
-const withShortCircuit = <F extends (...args: any[]) => any>(fn: F): F => {
-	return (async (...args) => {
-		return Object.assign(await fn(...args), { shortCircuit: true });
-	}) as F;
-}
-
-export const resolve: Resolve = withShortCircuit(async function (ident, context, fallback) {
+export const resolve: Resolve = async function (ident, context, fallback) {
 	// ignore "prefix:" and non-relative identifiers
 	if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
 
@@ -89,11 +82,11 @@ export const resolve: Resolve = withShortCircuit(async function (ident, context,
 	if (match = EXTN.exec(output.href)) {
 		ext = match[0] as Extension;
 		if (!context.parentURL || isTS.test(ext)) {
-			return { url: output.href };
+			return { url: output.href, shortCircuit: true };
 		}
 		// source ident exists
 		path = check(output.href);
-		if (path) return { url: path };
+		if (path) return { url: path, shortCircuit: true };
 		// parent importer is a ts file
 		// source ident is js & NOT exists
 		if (isJS.test(ext) && isTS.test(context.parentURL)) {
@@ -104,7 +97,7 @@ export const resolve: Resolve = withShortCircuit(async function (ident, context,
 				if (idx > output.href.length) {
 					path += output.href.substring(idx);
 				}
-				return { url: path };
+				return { url: path, shortCircuit: true };
 			}
 			// return original, let it error
 			return fallback(ident, context, fallback);
@@ -115,13 +108,13 @@ export const resolve: Resolve = withShortCircuit(async function (ident, context,
 
 	for (ext in config) {
 		path = check(output.href + ext);
-		if (path) return { url: path };
+		if (path) return { url: path, shortCircuit: true };
 	}
 
 	return fallback(ident, context, fallback);
-})
+}
 
-export const load: Load = withShortCircuit(async function (uri, context, fallback) {
+export const load: Load = async function (uri, context, fallback) {
 	// note: inline `getFormat`
 	let options = await toOptions(uri);
 	if (options == null) return fallback(uri, context, fallback);
@@ -139,8 +132,8 @@ export const load: Load = withShortCircuit(async function (uri, context, fallbac
 		format: format === 'module' ? 'esm' : 'cjs',
 	});
 
-	return { format, source: result.code };
-})
+	return { format, source: result.code, shortCircuit: true };
+}
 
 /** @deprecated */
 export const getFormat: Inspect = async function (uri, context, fallback) {
