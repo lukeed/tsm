@@ -30,8 +30,7 @@
   },
   "scripts": {
     "build": "node build",
-    "types": "tsc",
-    "test": "node bin.js test/config/index.ts --tsmconfig test/config/tsm.js && node bin.js test/index.mjs && node -r ./require.js test/config/index.ts --tsmconfig test/config/tsm.js && node -r ./require.js test/index.js && node --loader ./loader.mjs test/config/index.ts --tsmconfig test/config/tsm.js && node --loader ./loader.mjs test/index.mjs"
+    "types": "tsc"
   },
   "dependencies": {
     "esbuild": "^0.14.0"
