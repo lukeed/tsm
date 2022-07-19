@@ -30,7 +30,7 @@
   },
   "scripts": {
     "build": "node build",
-    "types": "tsc --lib dom"
+    "types": "tsc --skipLibCheck"
   },
   "dependencies": {
     "esbuild": "^0.14.0"
