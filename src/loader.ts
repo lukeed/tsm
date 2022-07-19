@@ -69,7 +69,6 @@ function check(fileurl: string): string | void {
 }
 
 const root = new URL('file:///' + process.cwd() + '/');
-
 export const resolve: Resolve = async function (ident, context, fallback) {
 	// ignore "prefix:" and non-relative identifiers
 	if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);

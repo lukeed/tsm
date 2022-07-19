@@ -27,6 +27,6 @@ if (argv.includes('-v') || argv.includes('--version')) {
 	process.exit(0);
 }
 
-let { pathToFileURL, URL: _URL } = require('url') as typeof import('url'); // NOTE _URL prevents type clash with global.URL if defined in @types/node / lib.dom
-argv = ['--loader', new _URL('loader.mjs', pathToFileURL(__filename)).href, ...argv];
+let { URL, pathToFileURL } = require('url') as typeof import('url');
+argv = ['--loader', new URL('loader.mjs', pathToFileURL(__filename)).href, ...argv];
 require('child_process').spawn('node', argv, { stdio: 'inherit' }).on('exit', process.exit);
