@@ -81,11 +81,11 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 	if (match = EXTN.exec(output.href)) {
 		ext = match[0] as Extension;
 		if (!context.parentURL || isTS.test(ext)) {
-			return { url: output.href };
+			return { url: output.href, shortCircuit: true };
 		}
 		// source ident exists
 		path = check(output.href);
-		if (path) return { url: path };
+		if (path) return { url: path, shortCircuit: true };
 		// parent importer is a ts file
 		// source ident is js & NOT exists
 		if (isJS.test(ext) && isTS.test(context.parentURL)) {
@@ -96,7 +96,7 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 				if (idx > output.href.length) {
 					path += output.href.substring(idx);
 				}
-				return { url: path };
+				return { url: path, shortCircuit: true };
 			}
 			// return original, let it error
 			return fallback(ident, context, fallback);
@@ -107,7 +107,7 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 
 	for (ext in config) {
 		path = check(output.href + ext);
-		if (path) return { url: path };
+		if (path) return { url: path, shortCircuit: true };
 	}
 
 	return fallback(ident, context, fallback);
@@ -131,7 +131,7 @@ export const load: Load = async function (uri, context, fallback) {
 		format: format === 'module' ? 'esm' : 'cjs',
 	});
 
-	return { format, source: result.code };
+	return { format, source: result.code, shortCircuit: true };
 }
 
 /** @deprecated */
