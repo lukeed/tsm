@@ -31,29 +31,26 @@ const vnode = {
 
 // Note: for Node 12.x tests
 (async function () {
-	assert(json != null, 'JSON :: load');
+	assert.ok(json != null, 'JSON :: load');
 	assert.equal(typeof json, 'object', 'JSON :: typeof');
 	assert.equal(json.foo, 123, 'JSON :: value');
 
 	// NOTE: no "default" key
-	assert(jsx, 'JSX :: typeof');
+	assert.ok(jsx, 'JSX :: typeof');
 	assert.equal(typeof jsx, 'function', 'JSX :: typeof');
 	assert.deepEqual(jsx(props), vnode, 'JSX :: value');
 
 	// NOTE: no "default" key
-	assert(tsx, 'TSX :: typeof');
+	assert.ok(tsx, 'TSX :: typeof');
 	assert.equal(typeof tsx, 'function', 'TSX :: typeof');
 	assert.deepEqual(tsx(props), vnode, 'TSX :: value');
 
-	assert(ts, 'TS :: typeof');
+	assert.ok(ts, 'TS :: typeof');
 	assert.equal(typeof ts, 'object', 'TS :: typeof');
 	assert.equal(typeof ts.sum, 'function', 'TS :: typeof :: sum');
 	assert.equal(typeof ts.div, 'function', 'TS :: typeof :: div');
 	assert.equal(typeof ts.mul, 'function', 'TS :: typeof :: mul');
 	assert.equal(ts.foobar, 3, 'TS :: value :: foobar');
-
-	assert.equal(typeof ts.dynamic, 'function', 'TS :: typeof :: dynamic');
-	assert.equal(await ts.dynamic(), 'Hello', 'TS :: value :: dynamic');
 
 	assert.equal(typeof mts, 'object', 'MTS :: typeof');
 	assert.equal(typeof mts.capitalize, 'function', 'MTS :: typeof :: capitalize');
