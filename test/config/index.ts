@@ -11,31 +11,44 @@ import * as esm from '../fixtures/module/index.js';
 
 // NOTE: avoid need for syntheticDefault + analysis
 import * as data from '../fixtures/data.json';
-assert.equal(typeof data, 'object');
 
-// @ts-ignore - generally doesn't exist
-assert.equal(typeof data.default, 'string');
+// NOTE: for CJS test runner
+(async function () {
+	assert.equal(typeof data, 'object');
 
-// NOTE: raw JS missing
-assert.equal(typeof js, 'object', 'JS :: typeof');
-assert.equal(typeof js.sum, 'function', 'JS :: typeof :: sum');
-assert.equal(typeof js.div, 'function', 'JS :: typeof :: div');
-assert.equal(typeof js.mul, 'function', 'JS :: typeof :: mul');
-assert.equal(js.foobar, 3, 'JS :: value :: foobar');
+	// @ts-ignore - generally doesn't exist
+	assert.equal(typeof data.default, 'string');
 
-// NOTE: raw MJS missing
-assert.equal(typeof mjs, 'object', 'MJS :: typeof');
-assert.equal(typeof mjs.capitalize, 'function', 'MJS :: typeof :: capitalize');
-assert.equal(mjs.capitalize('hello'), 'Hello', 'MJS :: value :: capitalize');
+	// NOTE: raw JS missing
+	assert.equal(typeof js, 'object', 'JS :: typeof');
+	assert.equal(typeof js.sum, 'function', 'JS :: typeof :: sum');
+	assert.equal(typeof js.div, 'function', 'JS :: typeof :: div');
+	assert.equal(typeof js.mul, 'function', 'JS :: typeof :: mul');
+	assert.equal(js.foobar, 3, 'JS :: value :: foobar');
 
-// NOTE: raw CJS missing
-assert.equal(typeof cjs, 'object', 'CJS :: typeof');
-assert.equal(typeof cjs.dashify, 'function', 'CJS :: typeof :: dashify');
-assert.equal(cjs.dashify('FooBar'), 'foo-bar', 'CJS :: value :: dashify');
+	assert.equal(typeof js.dynamic, 'function', 'JS :: typeof :: dynamic');
+	assert.equal(await js.dynamic(), 'Hello', 'JS :: value :: dynamic');
 
-// Checking ".js" with ESM content (type: module)
-assert.equal(typeof esm, 'object', 'ESM.js :: typeof');
-assert.equal(typeof esm.hello, 'function', 'ESM.js :: typeof :: hello');
-assert.equal(esm.hello('you'), 'hello, you', 'ESM.js :: value :: hello');
+	// NOTE: raw MJS missing
+	assert.equal(typeof mjs, 'object', 'MJS :: typeof');
+	assert.equal(typeof mjs.capitalize, 'function', 'MJS :: typeof :: capitalize');
+	assert.equal(mjs.capitalize('hello'), 'Hello', 'MJS :: value :: capitalize');
 
-console.log('DONE~!');
+	// NOTE: raw CJS missing
+	assert.equal(typeof cjs, 'object', 'CJS :: typeof');
+	assert.equal(typeof cjs.dashify, 'function', 'CJS :: typeof :: dashify');
+	assert.equal(cjs.dashify('FooBar'), 'foo-bar', 'CJS :: value :: dashify');
+
+	// Checking ".js" with ESM content (type: module)
+	assert.equal(typeof esm, 'object', 'ESM.js :: typeof');
+	assert.equal(typeof esm.hello, 'function', 'ESM.js :: typeof :: hello');
+	assert.equal(esm.hello('you'), 'hello, you', 'ESM.js :: value :: hello');
+
+	assert.equal(typeof esm.dynamicCJS, 'function', 'ESM.js :: typeof :: dynamicCJS');
+	assert.equal(await esm.dynamicCJS(), 'foo-bar', 'ESM.js :: value :: dynamicCJS');
+
+	assert.equal(typeof esm.dynamicMJS, 'function', 'ESM.js :: typeof :: dynamicMJS');
+	assert.equal(await esm.dynamicMJS(), 'Hello', 'ESM.js :: value :: dynamicMJS');
+
+	console.log('DONE~!');
+})();
