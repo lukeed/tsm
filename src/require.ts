@@ -1,8 +1,8 @@
-const { extname } = require('path');
 const { readFileSync } = require('fs');
+const { extname } = require('path');
 const tsm = require('./utils');
 
-import type { Config, Options } from 'tsm/config';
+import type { Config, Extension, Options } from 'tsm/config';
 type TSM = typeof import('./utils.d');
 
 type Module = NodeJS.Module & {
@@ -31,21 +31,31 @@ const tsrequire = 'var $$req=require("module").createRequire(__filename);require
 			if (/^\w+\:?/.test(ident)) return $$req(ident);
 
 			// exit early if no extension provided
-			let match = /\.([mc])?js(?=\?|$)/.exec(ident);
+			let match = /\.([mc])?[tj]sx?(?=\?|$)/.exec(ident);
 			if (match == null) return $$req(ident);
 
 			let base = $url.pathToFileURL(__filename);
 			let file = $url.fileURLToPath(new $url.URL(ident, base));
 			if (existsSync(file)) return $$req(ident);
 
-			// ?js -> ?ts file
-			file = file.replace(
-				new RegExp(match[0] + '$'),
-				match[0].replace('js', 'ts')
-			);
+			let extn = match[0] as Extension;
+			let rgx = new RegExp(extn + '$');
 
-			// return the new "[mc]ts" file, or let error
-			return existsSync(file) ? $$req(file) : $$req(ident);
+			// [cm]?jsx? -> [cm]?tsx?
+			let tmp = file.replace(rgx, extn.replace('js', 'ts'));
+			if (existsSync(tmp)) return $$req(tmp);
+
+			// look for ".[tj]sx" if ".js" given & still here
+			if (extn === '.js') {
+				tmp = file.replace(rgx, '.tsx');
+				if (existsSync(tmp)) return $$req(tmp);
+
+				tmp = file.replace(rgx, '.jsx');
+				if (existsSync(tmp)) return $$req(tmp);
+			}
+
+			// let it error
+			return $$req(ident);
 		}
 	})
 } + ')();';
@@ -56,13 +66,17 @@ function transform(source: string, options: Options): string {
 }
 
 function loader(Module: Module, sourcefile: string) {
-	let extn = extname(sourcefile);
+	let extn = extname(sourcefile) as Extension;
+
 	let options = config[extn] || {};
 	let pitch = Module._compile!.bind(Module);
 	options.sourcefile = sourcefile;
 
-	if (/\.[mc]?tsx?$/.test(extn)) {
+	if (/\.[mc]?[tj]sx?$/.test(extn)) {
 		options.banner = tsrequire + (options.banner || '');
+		// https://github.com/lukeed/tsm/issues/27
+		options.supported = options.supported || {};
+		options.supported['dynamic-import'] = false;
 	}
 
 	if (config[extn] != null) {

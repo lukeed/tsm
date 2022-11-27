@@ -1,19 +1,20 @@
 // @ts-check
-import assert from 'assert';
+import * as assert from 'assert';
+
+// @ts-ignore allowSyntheticDefaultImports
+import json from './fixtures/data.json';
 
 import jsx from './fixtures/App1';
-import json from './fixtures/data.json';
-// @ts-ignore – expects definitions
+// @ts-ignore – tsc does not like
 import * as mts from './fixtures/utils.mts';
-// @ts-ignore – expects definitions
+// @ts-ignore – tsc does not like
 import * as cts from './fixtures/utils.cts';
 // @ts-ignore – prefers extensionless
 import * as ts from './fixtures/math.ts';
 // @ts-ignore – prefers extensionless
 import tsx from './fixtures/App2.tsx';
-// @ts-ignore – prefers extensionless
+
 import * as esm1 from './fixtures/module/index.js';
-// @ts-ignore – prefers extensionless
 import * as esm2 from './fixtures/module/index.mjs';
 
 const props = {
@@ -60,24 +61,28 @@ assert.equal(typeof cts, 'object', 'CTS :: typeof');
 assert.equal(typeof cts.dashify, 'function', 'CTS :: typeof :: dashify');
 assert.equal(cts.dashify('FooBar'), 'foo-bar', 'CTS :: value :: dashify');
 
+// Checking ".js" with ESM content (type: module)
 assert.equal(typeof esm1, 'object', 'ESM.js :: typeof');
 assert.equal(typeof esm1.hello, 'function', 'ESM.js :: typeof :: hello');
 assert.equal(esm1.hello('you'), 'hello, you', 'ESM.js :: value :: hello');
 
-assert.equal(typeof esm1.dynamicCJS, 'function', 'ESM.js :: typeof :: dynamicCJS');
-assert.equal(await esm1.dynamicCJS(), 'foo-bar', 'ESM.js :: value :: dynamicCJS');
+// DYANMIC IMPORTS via JS file
+assert.equal(typeof esm1.dynamic, 'object', 'ESM.js :: typeof :: dynamic');
+assert.equal(await esm1.dynamic.cjs(), 'foo-bar', 'ESM.js :: dynamic :: import(cjs)');
+assert.equal(await esm1.dynamic.cts(), 'foo-bar', 'ESM.js :: dynamic :: import(cts)');
+assert.equal(await esm1.dynamic.mjs(), 'Hello', 'ESM.js :: dynamic :: import(mjs)');
+assert.equal(await esm1.dynamic.mts(), 'Hello', 'ESM.js :: dynamic :: import(mts)');
 
-assert.equal(typeof esm1.dynamicMJS, 'function', 'ESM.js :: typeof :: dynamicMJS');
-assert.equal(await esm1.dynamicMJS(), 'Hello', 'ESM.js :: value :: dynamicMJS');
-
+// Checking ".mjs" with ESM content
 assert.equal(typeof esm2, 'object', 'ESM.mjs :: typeof');
 assert.equal(typeof esm2.hello, 'function', 'ESM.mjs :: typeof :: hello');
 assert.equal(esm2.hello('you'), 'hello, you', 'ESM.mjs :: value :: hello');
 
-assert.equal(typeof esm2.dynamicCJS, 'function', 'ESM.mjs :: typeof :: dynamicCJS');
-assert.equal(await esm2.dynamicCJS(), 'foo-bar', 'ESM.mjs :: value :: dynamicCJS');
-
-assert.equal(typeof esm2.dynamicMJS, 'function', 'ESM.mjs :: typeof :: dynamicMJS');
-assert.equal(await esm2.dynamicMJS(), 'Hello', 'ESM.mjs :: value :: dynamicMJS');
+// DYANMIC IMPORTS via MJS file
+assert.equal(typeof esm2.dynamic, 'object', 'ESM.mjs :: typeof :: dynamic');
+assert.equal(await esm2.dynamic.cjs(), 'foo-bar', 'ESM.mjs :: dynamic :: import(cjs)');
+assert.equal(await esm2.dynamic.cts(), 'foo-bar', 'ESM.mjs :: dynamic :: import(cts)');
+assert.equal(await esm2.dynamic.mjs(), 'Hello', 'ESM.mjs :: dynamic :: import(mjs)');
+assert.equal(await esm2.dynamic.mts(), 'Hello', 'ESM.mjs :: dynamic :: import(mts)');
 
 console.log('DONE~!');

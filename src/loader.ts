@@ -24,6 +24,7 @@ type Resolve = (
 	fallback: Resolve
 ) => Promisable<{
 	url: string;
+	shortCircuit: boolean;
 	format?: Format;
 }>;
 
@@ -45,6 +46,7 @@ type Load = (
 	fallback: Load
 ) => Promisable<{
 	format: Format;
+	shortCircuit: boolean;
 	source: Source;
 }>;
 
@@ -56,7 +58,7 @@ async function toConfig(): Promise<Config> {
 
 const EXTN = /\.\w+(?=\?|$)/;
 const isTS = /\.[mc]?tsx?(?=\?|$)/;
-const isJS = /\.([mc])?js$/;
+
 async function toOptions(uri: string): Promise<Options|void> {
 	config = config || await toConfig();
 	let [extn] = EXTN.exec(uri) || [];
@@ -68,45 +70,63 @@ function check(fileurl: string): string | void {
 	if (existsSync(tmp)) return fileurl;
 }
 
+/**
+ * extension aliases; runs after checking for extn on disk
+ * @example `import('./foo.mjs')` but only `foo.mts` exists
+ */
+const MAPs: Record<Extension, Extension[]> = {
+	'.js': ['.ts', '.tsx', '.jsx'],
+	'.jsx': ['.tsx'],
+	'.mjs': ['.mts'],
+	'.cjs': ['.cts'],
+};
+
 const root = new URL('file:///' + process.cwd() + '/');
 export const resolve: Resolve = async function (ident, context, fallback) {
 	// ignore "prefix:" and non-relative identifiers
 	if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
 
-	let match: RegExpExecArray | null;
-	let idx: number, ext: Extension, path: string | void;
-	let output = new URL(ident, context.parentURL || root);
+	let target = new URL(ident, context.parentURL || root);
+	let ext: Extension, path: string | void, arr: Extension[];
+	let match: RegExpExecArray | null, i=0, base: string;
 
 	// source ident includes extension
-	if (match = EXTN.exec(output.href)) {
+	if (match = EXTN.exec(target.href)) {
 		ext = match[0] as Extension;
 		if (!context.parentURL || isTS.test(ext)) {
-			return { url: output.href, shortCircuit: true };
+			return { url: target.href, shortCircuit: true };
 		}
-		// source ident exists
-		path = check(output.href);
-		if (path) return { url: path, shortCircuit: true };
-		// parent importer is a ts file
-		// source ident is js & NOT exists
-		if (isJS.test(ext) && isTS.test(context.parentURL)) {
-			// reconstruct ".js" -> ".ts" source file
-			path = output.href.substring(0, idx = match.index);
-			if (path = check(path + ext.replace('js', 'ts'))) {
-				idx += ext.length;
-				if (idx > output.href.length) {
-					path += output.href.substring(idx);
+
+		// target ident exists
+		if (path = check(target.href)) {
+			return { url: path, shortCircuit: true };
+		}
+
+		// target is virtual alias
+		if (arr = MAPs[ext]) {
+			base = target.href.substring(0, match.index);
+			for (; i < arr.length; i++) {
+				if (path = check(base + arr[i])) {
+					i = match.index + ext.length;
+					return {
+						shortCircuit: true,
+						url: i > target.href.length
+							// handle target `?args` trailer
+							? base + target.href.substring(i)
+							: path
+					};
 				}
-				return { url: path, shortCircuit: true };
 			}
-			// return original, let it error
-			return fallback(ident, context, fallback);
 		}
+
+		// return original behavior, let it error
+		return fallback(ident, context, fallback);
 	}
 
 	config = config || await toConfig();
 
 	for (ext in config) {
-		path = check(output.href + ext);
+		path = check(target.href + ext);
 		if (path) return { url: path, shortCircuit: true };
 	}
 
