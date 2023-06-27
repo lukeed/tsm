@@ -40,15 +40,17 @@ type Transform = (
 	fallback: Transform
 ) => Promisable<{ source: Source }>;
 
-type Load = (
-	url: string,
-	context: { format?: Format },
-	fallback: Load
-) => Promisable<{
+type LoadResult = Promisable<{
 	format: Format;
 	shortCircuit: boolean;
 	source: Source;
-}>;
+}>
+
+type Load = (
+	url: string,
+	context: { format?: Format },
+	fallback: (url: string, context: { format?: Format }) => LoadResult
+) => LoadResult;
 
 async function toConfig(): Promise<Config> {
 	let mod = await setup;
@@ -136,7 +138,7 @@ export const resolve: Resolve = async function (ident, context, fallback) {
 export const load: Load = async function (uri, context, fallback) {
 	// note: inline `getFormat`
 	let options = await toOptions(uri);
-	if (options == null) return fallback(uri, context, fallback);
+	if (options == null) return fallback(uri, context);
 	let format: Format = options.format === 'cjs' ? 'commonjs' : 'module';
 
 	// TODO: decode SAB/U8 correctly
