@@ -9,6 +9,9 @@
   <a href="https://github.com/lukeed/tsm/actions">
     <img src="https://github.com/lukeed/tsm/workflows/CI/badge.svg" alt="CI" />
   </a>
+  <a href="https://licenses.dev/npm/tsm">
+    <img src="https://licenses.dev/b/npm/tsm" alt="licenses" />
+  </a>
   <a href="https://npmjs.org/package/tsm">
     <img src="https://badgen.net/npm/dm/tsm" alt="downloads" />
   </a>
