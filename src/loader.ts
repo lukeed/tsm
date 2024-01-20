@@ -85,8 +85,8 @@ const MAPs: Record<Extension, Extension[]> = {
 
 const root = new URL('file:///' + process.cwd() + '/');
 export const resolve: Resolve = async function (ident, context, fallback) {
-	// ignore "prefix:" and non-relative identifiers
-	if (/^\w+\:?/.test(ident)) return fallback(ident, context, fallback);
+	// ignore "prefix:", non-relative identifiers, and subpath imports
+	if (/^\w+\:?/.test(ident) || ident.startsWith('#')) return fallback(ident, context, fallback);
 
 	let target = new URL(ident, context.parentURL || root);
 	let ext: Extension, path: string | void, arr: Extension[];
